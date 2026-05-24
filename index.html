@@ -12,7 +12,7 @@
     --text: #f0eff4; --muted: #7c7c8a; --green: #39d98a;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding-bottom: 60px; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding-bottom: 100px; }
 
   /* ── Header ── */
   .header {
@@ -22,6 +22,7 @@
     display: flex; align-items: flex-end; gap: 16px;
     position: sticky; top: 0; z-index: 10;
     backdrop-filter: blur(12px);
+    flex-wrap: wrap;
   }
   .logo { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; letter-spacing: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
   .logo-sub { font-size: 0.7rem; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; padding-bottom: 4px; }
@@ -129,6 +130,83 @@
   .skel-line { height: 13px; border-radius: 5px; }
   .skel-tag  { height: 20px; width: 70px; border-radius: 5px; }
   .skel-btn  { height: 32px; width: 100px; border-radius: 7px; margin-left: auto; }
+
+
+  .tip-jar-left { display: flex; align-items: center; gap: 12px; }
+  .tip-jar-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .tip-jar-text { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+  .tip-jar-text strong { color: var(--text); display: block; margin-bottom: 2px; }
+  .tip-wallet {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 14px;
+    flex-wrap: wrap;
+  }
+  .tip-sol-badge {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 1px;
+    background: linear-gradient(135deg, #9945ff, #14f195);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    flex-shrink: 0;
+  }
+  .tip-address {
+    font-family: 'Courier New', monospace; font-size: 0.75rem;
+    color: var(--muted); letter-spacing: 0.3px;
+    max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .tip-copy-btn {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--muted); padding: 5px 12px; border-radius: 6px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.72rem; font-weight: 600;
+    cursor: pointer; transition: all 0.18s; white-space: nowrap; flex-shrink: 0;
+  }
+  .tip-copy-btn:hover { border-color: #9945ff; color: #9945ff; }
+  .tip-copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+  /* ── Source switcher ── */
+  .source-nav {
+    display: flex; gap: 8px; margin-bottom: 24px;
+    border-bottom: 1px solid var(--border); padding-bottom: 16px;
+  }
+  .source-btn {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--muted); padding: 8px 18px; border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 600;
+    cursor: pointer; transition: all 0.18s; display: flex; align-items: center; gap: 7px;
+  }
+  .source-btn:hover { border-color: var(--accent2); color: var(--text); }
+  .source-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* GamerPower card — same as Reddit card */
+  .gp-source-badge {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 5px; white-space: nowrap;
+    background: #1a2a1a; color: #4ade80; border: 1px solid #2a4a2a;
+  }
+  .gp-worth { font-size: 0.75rem; color: var(--muted); }
+  .gp-worth span { color: var(--accent2); font-weight: 600; }
+
+  /* ── Fixed tip bar ── */
+  .tip-bar {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    z-index: 100;
+    padding: 14px 20px;
+    width: calc(100% - 64px);
+    max-width: 1100px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  .tip-bar-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+  }
+  .tip-bar-left { display: flex; align-items: center; gap: 12px; }
+  .tip-bar-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .tip-bar-label {
+    font-size: 0.82rem; color: var(--muted); font-weight: 500; line-height: 1.5;
+  }
+  .tip-bar-label strong { color: var(--text); display: block; margin-bottom: 2px; }
 </style>
 </head>
 <body>
@@ -141,7 +219,7 @@
   <div class="header-right">
     <span class="cache-note" id="cacheNote" style="display:none"></span>
     <span class="live-badge" id="liveCount" style="display:none"></span>
-    <button class="refresh-btn" id="refreshBtn" onclick="loadGiveaways(true)">
+    <button class="refresh-btn" id="refreshBtn" onclick="_currentSource==='gamerpower' ? loadGamerPower(true) : loadGiveaways(true)">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
         <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
@@ -149,17 +227,28 @@
       Refresh
     </button>
   </div>
+
 </div>
 
 <div class="main">
+  <div class="source-nav">
+    <button class="source-btn active" id="srcGamerpower" onclick="switchSource('gamerpower')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M21 6H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1zm-10 7H9v2H7v-2H5v-2h2V9h2v2h2v2zm4.5 1a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-3a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
+      GamerPower
+    </button>
+    <button class="source-btn" id="srcReddit" onclick="switchSource('reddit')">
+      <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10c0 5.52 4.48 10 10 10s10-4.48 10-10zm-7.41-1.59a1.5 1.5 0 1 1 2.12 2.12 1.5 1.5 0 0 1-2.12-2.12zm-5.18 0a1.5 1.5 0 1 1 2.12 2.12 1.5 1.5 0 0 1-2.12-2.12zM10 15.5c-2.33 0-4.32-1.45-5.12-3.5h10.24c-.8 2.05-2.79 3.5-5.12 3.5z"/></svg>
+      Reddit
+    </button>
+  </div>
   <div id="countInfo" class="count-info" style="display:none"></div>
   <div id="content"></div>
 </div>
 
 <script>
 // ── Config ────────────────────────────────────────────────────────────────────
-const MAX_AGE_HOURS   = 72;
-const CACHE_KEY       = 'lootRadar_cache_v2'; // bump version on breaking changes
+const MAX_AGE_HOURS   = 720; // 30 days
+const CACHE_KEY       = 'freedrops_cache_v2'; // bump version on breaking changes
 const CACHE_TTL_MS    = 15 * 60 * 1000; // 15 minutes
 
 const SUBREDDITS = [
@@ -184,13 +273,15 @@ const EXCLUDE_EXCEPTIONS = ['100% off','free bundle','humble free','free humble'
 const EXPIRED_MARKERS    = ['[expired]','(expired)','expired','[ended]','(ended)','[over]','[closed]'];
 
 const PLATFORMS = [
-  { key:'steam',   label:'🎮 Steam',    cls:'tag-steam',   patterns:['[steam]','steam','steampowered'] },
-  { key:'epic',    label:'⚡ Epic',     cls:'tag-epic',    patterns:['[epic]','epic games','epicgames'] },
-  { key:'gog',     label:'🌌 GOG',      cls:'tag-gog',     patterns:['[gog]','gog.com','gog '] },
-  { key:'itch',    label:'🎲 Itch.io',  cls:'tag-itch',    patterns:['[itch]','itch.io'] },
-  { key:'ubisoft', label:'🔷 Ubisoft',  cls:'tag-ubisoft', patterns:['[ubisoft]','ubisoft connect','uplay'] },
-  { key:'origin',  label:'🔶 EA/Origin',cls:'tag-origin',  patterns:['[origin]','[ea]','origin.com','ea app'] },
-  { key:'humble',  label:'🎁 Humble',   cls:'tag-humble',  patterns:['[humble]','humble bundle','humblebundle'] },
+  // Epic must come before Steam — "epic games" titles sometimes also mention steam
+  { key:'epic',    label:'⚡ Epic',     cls:'tag-epic',    patterns:['[epic]','(epic)','[egs]','epic games','epicgames','epic game','epic store','epic mega','store.epicgames','epicgames.com','egs free'] },
+  { key:'gog',     label:'🌌 GOG',      cls:'tag-gog',     patterns:['[gog]','(gog)','gog.com','gog '] },
+  { key:'itch',    label:'🎲 Itch.io',  cls:'tag-itch',    patterns:['[itch]','(itch)','itch.io'] },
+  { key:'ubisoft', label:'🔷 Ubisoft',  cls:'tag-ubisoft', patterns:['[ubisoft]','(ubisoft)','ubisoft connect','uplay'] },
+  { key:'origin',  label:'🔶 EA/Origin',cls:'tag-origin',  patterns:['[origin]','[ea]','(ea)','origin.com','ea app'] },
+  { key:'humble',  label:'🎁 Humble',   cls:'tag-humble',  patterns:['[humble]','(humble)','humble bundle','humblebundle'] },
+  // Steam last — its pattern 'steam' is broad and would swallow everything above
+  { key:'steam',   label:'🎮 Steam',    cls:'tag-steam',   patterns:['[steam]','(steam)','steampowered','steam ','steamgifts'] },
 ];
 
 // ── Cache ─────────────────────────────────────────────────────────────────────
@@ -247,7 +338,7 @@ async function fetchWithFallback(redditUrl, externalSignal) {
   }
   // Direct fetch — works when opened locally
   try {
-    const res = await fetch(redditUrl, { headers: { 'User-Agent': 'LootRadar/1.0' }, signal: AbortSignal.timeout(8000) });
+    const res = await fetch(redditUrl, { headers: { 'User-Agent': 'FreeDrops/1.0' }, signal: AbortSignal.timeout(8000) });
     if (res.ok) {
       const data = await res.json();
       if (data?.data?.children) return data.data.children.map(c => c.data);
@@ -275,28 +366,94 @@ function isRecent(post) {
 }
 
 function detectPlatform(post) {
-  const text = (post.title + ' ' + (post.link_flair_text || '') + ' ' + (post.url || '')).toLowerCase();
+  const title    = (post.title + ' ' + (post.link_flair_text || '')).toLowerCase();
+  const fullText = (title + ' ' + (post.url || '') + ' ' + (post.selftext || '')).toLowerCase();
+
+  // Pass 1 — title/flair only using bracket patterns (most reliable)
+  const BRACKET_PATTERNS = {
+    steam:   ['[steam]','(steam)'],
+    epic:    ['[epic]','(epic)','[egs]'],
+    gog:     ['[gog]','(gog)'],
+    itch:    ['[itch]','(itch)','itch.io'],
+    ubisoft: ['[ubisoft]','(ubisoft)'],
+    origin:  ['[origin]','[ea]','(ea)'],
+    humble:  ['[humble]','(humble)'],
+  };
   for (const p of PLATFORMS) {
-    if (p.patterns.some(pat => text.includes(pat))) return p;
+    const brackets = BRACKET_PATTERNS[p.key] || [];
+    if (brackets.some(pat => title.includes(pat))) return p;
   }
+
+  // Pass 2 — broader scan of full text including URL and selftext
+  // Epic checked first since "epic games" is very specific; Steam last since "steam" is broad
+  const BROAD_PATTERNS = [
+    { key:'epic',    patterns:['epic games','epicgames','epic game','epic mega','store.epicgames','epicgames.com','egs free'] },
+    { key:'gog',     patterns:['gog.com','gog '] },
+    { key:'itch',    patterns:[] }, // already caught by bracket pass
+    { key:'ubisoft', patterns:['ubisoft connect','uplay'] },
+    { key:'origin',  patterns:['origin.com','ea app'] },
+    { key:'humble',  patterns:['humble bundle','humblebundle'] },
+    { key:'steam',   patterns:['steampowered','steamgifts','steam '] },
+  ];
+  for (const { key, patterns } of BROAD_PATTERNS) {
+    if (patterns.some(pat => fullText.includes(pat))) {
+      return PLATFORMS.find(p => p.key === key) || null;
+    }
+  }
+
   return null;
 }
 
 // ── Thumbnail helper ──────────────────────────────────────────────────────────
-function getThumbnail(post) {
-  // Reddit provides preview images at multiple resolutions — pick a medium one
+// ── Thumbnail: Reddit first, Steam CDN fallback ───────────────────────────────
+
+// Patterns that indicate a generic/promo image (not a real game screenshot)
+const BAD_THUMB_PATTERNS = [
+  'luna', 'amazon.com', 'redd.it/static', 'reddit.com/static',
+  'styles.redditmedia', 'a.thumbs.redditmedia', 'external-preview.redd'
+];
+
+function isBadThumb(url) {
+  if (!url) return true;
+  const u = url.toLowerCase();
+  return BAD_THUMB_PATTERNS.some(p => u.includes(p));
+}
+
+// Parse the game name from FreeGameFindings-style titles:
+// "[Steam] (Game) Car Mechanic Simulator 2018" → "Car Mechanic Simulator 2018"
+function parseGameName(title) {
+  // Remove leading bracket groups like [Steam], (Game), [PSA], [DLC] etc.
+  return title
+    .replace(/^(\[[^\]]*\]\s*|\([^)]*\)\s*)+/i, '')
+    .replace(/^(\[[^\]]*\]\s*|\([^)]*\)\s*)+/i, '') // second pass for double brackets
+    .trim();
+}
+
+// Steam image cache to avoid re-fetching
+const _steamImgCache = {};
+
+async function fetchSteamImage(gameName) {
+  if (_steamImgCache[gameName] !== undefined) return _steamImgCache[gameName];
   try {
-    const previews = post.preview?.images?.[0]?.resolutions;
-    if (previews && previews.length) {
-      // Pick one around 640px wide, or the largest available
-      const mid = previews.find(r => r.width >= 500) || previews[previews.length - 1];
-      // Reddit HTML-encodes the URLs
-      return mid.url.replace(/&amp;/g, '&');
-    }
-  } catch { /* no preview */ }
-  // Fallback: post.thumbnail is a small ~70px thumb but better than nothing
-  if (post.thumbnail && post.thumbnail.startsWith('http')) return post.thumbnail;
-  return null;
+    const q = encodeURIComponent(gameName);
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://store.steampowered.com/api/storesearch/?term=${q}&cc=US&l=en`)}`;
+    const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) throw new Error('proxy fail');
+    const outer = await res.json();
+    const data = JSON.parse(outer.contents);
+    const item = data?.items?.[0];
+    if (!item) { _steamImgCache[gameName] = null; return null; }
+    const url = `https://cdn.akamai.steamstatic.com/steam/apps/${item.id}/header.jpg`;
+    _steamImgCache[gameName] = url;
+    return url;
+  } catch {
+    _steamImgCache[gameName] = null;
+    return null;
+  }
+}
+
+function getThumbnail(post) {
+  return null; // always use Steam CDN lookup via fillMissingThumbs
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -336,7 +493,7 @@ function renderError(detail) {
     <div class="state-box">
       <div class="icon">⚠️</div>
       <p><strong>Couldn't load giveaways</strong><br><br>${detail}</p>
-      <button class="error-btn" onclick="loadGiveaways(true)">Try Again</button>
+      <button class="error-btn" onclick="_currentSource==='gamerpower' ? loadGamerPower(true) : loadGiveaways(true)">Try Again</button>
     </div>`;
 }
 
@@ -344,15 +501,22 @@ function buildCard(p, i, isExp) {
   const ageHours = (Date.now() / 1000 - p.created_utc) / 3600;
   const platform = detectPlatform(p);
   const thumb    = getThumbnail(p);
+  const cardId   = `card-${p.id}`;
 
   const ageTag     = !isExp && ageHours < 6 ? `<span class="tag tag-new">New</span>`
                    : !isExp && p.score > 300 ? `<span class="tag tag-hot">🔥 Hot</span>` : '';
   const expiredTag = isExp ? `<span class="tag tag-expired">⏰ Expired</span>` : '';
   const platTag    = platform ? `<span class="tag ${platform.cls}">${platform.label}</span>` : '';
 
-  const thumbHtml = thumb
-    ? `<img class="card-thumb" src="${escHtml(thumb)}" alt="" loading="lazy" onerror="this.outerHTML='<div class=\'card-thumb-placeholder\'>🎮</div>'">`
-    : `<div class="card-thumb-placeholder">🎮</div>`;
+  // If no Reddit thumb, show placeholder and async-load from Steam CDN
+  let thumbHtml;
+  if (thumb) {
+    thumbHtml = `<img class="card-thumb" src="${escHtml(thumb)}" alt="" loading="lazy"
+      onerror="loadSteamThumb(this, '${escHtml(parseGameName(p.title))}')">`;
+  } else {
+    const gameName = escHtml(parseGameName(p.title));
+    thumbHtml = `<div class="card-thumb-placeholder" id="thumb-${escHtml(p.id)}" data-game="${gameName}">🎮</div>`;
+  }
 
   const storeUrl = p.url && !p.url.includes('reddit.com') ? p.url : null;
   let buttons = '';
@@ -508,9 +672,233 @@ function renderContent(active, expired, fromCache, cacheTs, resetTab) {
   }
 
   document.getElementById('content').innerHTML = nav + cardsHtml;
+  // Async-fill any cards that had no Reddit thumbnail
+  setTimeout(fillMissingThumbs, 0);
 }
 
 // ── Load ──────────────────────────────────────────────────────────────────────
+// ── GamerPower API ────────────────────────────────────────────────────────────
+let _currentSource = 'gamerpower'; // 'reddit' | 'gamerpower'
+const GP_CACHE_KEY = 'freedrops_gp_cache_v1';
+const GP_CACHE_TTL = 15 * 60 * 1000;
+
+function switchSource(src) {
+  _currentSource = src;
+  document.getElementById('srcReddit').classList.toggle('active', src === 'reddit');
+  document.getElementById('srcGamerpower').classList.toggle('active', src === 'gamerpower');
+  if (src === 'gamerpower') {
+    loadGamerPower(false);
+  } else {
+    loadGiveaways(false);
+  }
+}
+
+const GP_PLATFORM_MAP = {
+  'steam':            { key:'steam',   label:'🎮 Steam',    cls:'tag-steam'   },
+  'epic-games-store': { key:'epic',    label:'⚡ Epic',     cls:'tag-epic'    },
+  'gog':              { key:'gog',     label:'🌌 GOG',      cls:'tag-gog'     },
+  'itchio':           { key:'itch',    label:'🎲 Itch.io',  cls:'tag-itch'    },
+  'ubisoft':          { key:'ubisoft', label:'🔷 Ubisoft',  cls:'tag-ubisoft' },
+  'origin':           { key:'origin',  label:'🔶 EA/Origin',cls:'tag-origin'  },
+};
+
+function gpPlatformTag(platforms) {
+  if (!platforms) return '';
+  const key = platforms.toLowerCase().split(',')[0].trim();
+  const p = GP_PLATFORM_MAP[key];
+  return p ? `<span class="tag ${p.cls}">${p.label}</span>` : `<span class="tag tag-sub">${escHtml(platforms)}</span>`;
+}
+
+function buildGPCard(g, i) {
+  const thumb = g.thumbnail || g.image || null;
+  const thumbHtml = thumb
+    ? `<img class="card-thumb" src="${escHtml(thumb)}" alt="" loading="lazy" onerror="this.outerHTML='<div class=\'card-thumb-placeholder\'>🎮</div>'">`
+    : `<div class="card-thumb-placeholder">🎮</div>`;
+
+  const worth = g.worth && g.worth !== 'N/A' && g.worth !== '$0.00'
+    ? `<span class="gp-worth">was <span>${escHtml(g.worth)}</span></span>` : '';
+
+  const endDate = g.end_date && g.end_date !== 'N/A'
+    ? `<span class="card-time">ends ${escHtml(g.end_date.split(' ')[0])}</span>` : '';
+
+  return `
+    <div class="card" style="animation-delay:${i * 0.04}s">
+      ${thumbHtml}
+      <div class="card-body">
+        <div class="card-title">${escHtml(g.title)}</div>
+        <div class="card-meta">
+          <span class="gp-source-badge">GamerPower</span>
+          ${gpPlatformTag(g.platforms)}
+          ${endDate}
+        </div>
+        <div class="card-footer">
+          ${worth}
+          <div class="btn-group">
+            <a class="claim-btn" href="${escHtml(g.open_giveaway_url)}" target="_blank" rel="noopener">Claim Free →</a>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function buildGPImageMap(games) {
+  for (const g of games) {
+    if (!g.thumbnail && !g.image) continue;
+    const img = g.thumbnail || g.image;
+    // Index by full title and by parsed name (stripped of store suffix like "(Steam) Giveaway")
+    const full = g.title.toLowerCase().trim();
+    const parsed = full
+      .replace(/\(.*?\)/g, '')   // remove parentheses
+      .replace(/giveaway|free/gi, '')
+      .trim();
+    _gpImageMap[full]   = img;
+    _gpImageMap[parsed] = img;
+  }
+}
+
+function findGPImage(postTitle) {
+  const name = parseGameName(postTitle).toLowerCase().trim();
+  // Try exact match first
+  if (_gpImageMap[name]) return _gpImageMap[name];
+  // Try partial match — check if any GP key is contained in the post name or vice versa
+  for (const [key, url] of Object.entries(_gpImageMap)) {
+    if (key.length > 4 && (name.includes(key) || key.includes(name))) return url;
+  }
+  return null;
+}
+
+async function loadGamerPower(forceRefresh = false) {
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  btn.disabled = true;
+
+  // Try cache
+  if (!forceRefresh) {
+    try {
+      const raw = localStorage.getItem(GP_CACHE_KEY);
+      if (raw) {
+        const { ts, games } = JSON.parse(raw);
+        if (Date.now() - ts < GP_CACHE_TTL) {
+          buildGPImageMap(games);
+          renderGPCards(games, true, ts);
+          btn.classList.remove('spinning');
+          btn.disabled = false;
+          return;
+        }
+      }
+    } catch { /* ignore */ }
+  }
+
+  renderSkeletons();
+  document.getElementById('liveCount').style.display = 'none';
+  document.getElementById('countInfo').style.display = 'none';
+  document.getElementById('cacheNote').style.display = 'none';
+
+  try {
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://www.gamerpower.com/api/giveaways?type=game&platform=pc')}`;
+    const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(10000) });
+    const outer = await res.json();
+    const games = JSON.parse(outer.contents);
+
+    if (!Array.isArray(games) || !games.length) throw new Error('No games returned');
+
+    try { localStorage.setItem(GP_CACHE_KEY, JSON.stringify({ ts: Date.now(), games })); } catch { /* full */ }
+    buildGPImageMap(games);
+    renderGPCards(games, false, null);
+  } catch (e) {
+    // Try stale cache
+    try {
+      const raw = localStorage.getItem(GP_CACHE_KEY);
+      if (raw) { const { ts, games } = JSON.parse(raw); renderGPCards(games, true, ts); return; }
+    } catch { /* ignore */ }
+    renderError('Could not load GamerPower data: ' + e.message);
+  } finally {
+    btn.classList.remove('spinning');
+    btn.disabled = false;
+  }
+}
+
+// GamerPower platform key from platforms string
+function gpGetPlatformKey(platforms) {
+  if (!platforms) return null;
+  const p = platforms.toLowerCase();
+  if (p.includes('epic-games-store') || p.includes('epic')) return 'epic';
+  if (p.includes('gog'))    return 'gog';
+  if (p.includes('itchio') || p.includes('itch.io')) return 'itch';
+  if (p.includes('ubisoft')) return 'ubisoft';
+  if (p.includes('origin')) return 'origin';
+  if (p.includes('steam'))  return 'steam';
+  return null;
+}
+
+const GP_SECTIONS = [
+  { key: 'all',    label: 'All'      },
+  { key: 'steam',  label: 'Steam'    },
+  { key: 'epic',   label: 'Epic'     },
+  { key: 'itch',   label: 'Itch.io'  },
+  { key: 'gog',    label: 'GOG'      },
+  { key: 'others', label: 'Others'   },
+];
+
+let _gpCurrentSection = 'all';
+let _gpAllGames = [];
+const _gpImageMap = {}; // gameName (lowercase) → thumbnail url
+
+function gpGetGamesForSection(key, games) {
+  const MAIN_KEYS = ['steam','epic','itch','gog'];
+  if (key === 'all')    return games;
+  if (key === 'others') return games.filter(g => !MAIN_KEYS.includes(gpGetPlatformKey(g.platforms)));
+  return games.filter(g => gpGetPlatformKey(g.platforms) === key);
+}
+
+function gpRenderNav(games) {
+  const btns = GP_SECTIONS.map(s => {
+    const cnt = gpGetGamesForSection(s.key, games).length;
+    if (cnt === 0 && s.key !== 'all') return '';
+    const iconUrl = SECTION_ICONS[s.key];
+    const iconHtml = iconUrl
+      ? `<img src="${iconUrl}" class="pnav-icon" alt="" onerror="this.style.display='none'">`
+      : '';
+    return `<button class="pnav-btn${_gpCurrentSection === s.key ? ' active' : ''}"
+      onclick="gpSwitchSection('${s.key}')">${iconHtml}${s.label}<span class="pnav-count">${cnt}</span></button>`;
+  }).join('');
+  return `<div class="platform-nav">${btns}</div>`;
+}
+
+function gpSwitchSection(key) {
+  _gpCurrentSection = key;
+  gpRenderContent(_gpAllGames, null, null, false);
+}
+
+function gpRenderContent(games, fromCache, cacheTs, resetTab) {
+  if (resetTab) _gpCurrentSection = 'all';
+  const filtered = gpGetGamesForSection(_gpCurrentSection, games);
+  const nav = gpRenderNav(games);
+  const cardsHtml = filtered.length
+    ? `<div class="grid">${filtered.map((g, i) => buildGPCard(g, i)).join('')}</div>`
+    : `<div class="state-box" style="padding:40px 0"><div class="icon">🔍</div><p>No giveaways in this category right now.</p></div>`;
+  document.getElementById('content').innerHTML = nav + cardsHtml;
+}
+
+function renderGPCards(games, fromCache, cacheTs) {
+  _gpAllGames = games;
+
+  const cacheNote = document.getElementById('cacheNote');
+  if (fromCache && cacheTs) {
+    cacheNote.textContent = `cached ${cacheAge(cacheTs)}`;
+    cacheNote.style.display = 'inline';
+  } else {
+    cacheNote.style.display = 'none';
+  }
+
+  document.getElementById('liveCount').textContent = games.length + ' live';
+  document.getElementById('liveCount').style.display = 'inline-block';
+  document.getElementById('countInfo').innerHTML = `<span>${games.length}</span> active giveaways from GamerPower`;
+  document.getElementById('countInfo').style.display = 'block';
+
+  gpRenderContent(games, fromCache, cacheTs, true);
+}
+
 let _fetchController = null;
 
 async function loadGiveaways(forceRefresh = false) {
@@ -587,8 +975,85 @@ function splitPosts(posts) {
   };
 }
 
-// Auto-load on open — serve cache instantly if fresh, fetch if stale
-loadGiveaways(false);
+// Auto-load on open — GamerPower is the default tab
+loadGamerPower(false);
+
+// ── Steam CDN image loader ─────────────────────────────────────────────────
+// Called by onerror on broken Reddit thumbs
+async function loadSteamThumb(imgEl, gameName) {
+  const url = await fetchSteamImage(gameName);
+  if (url) {
+    imgEl.src = url;
+    imgEl.onerror = () => { imgEl.outerHTML = '<div class="card-thumb-placeholder">🎮</div>'; };
+  } else {
+    imgEl.outerHTML = '<div class="card-thumb-placeholder">🎮</div>';
+  }
+}
+
+// After cards render, async-fill placeholders:
+// 1. Try GamerPower image map (instant, no fetch)
+// 2. Fall back to Steam CDN search
+async function fillMissingThumbs() {
+  const placeholders = document.querySelectorAll('.card-thumb-placeholder[data-game]');
+  for (const el of placeholders) {
+    const gameName = el.getAttribute('data-game');
+    if (!gameName) continue;
+
+    // Try GP map first (no network call)
+    const gpUrl = findGPImage(gameName);
+    const url   = gpUrl || await fetchSteamImage(gameName);
+
+    if (url) {
+      const img = document.createElement('img');
+      img.className = 'card-thumb';
+      img.src = url;
+      img.alt = '';
+      img.loading = 'lazy';
+      img.onerror = () => { img.outerHTML = '<div class="card-thumb-placeholder">🎮</div>'; };
+      el.replaceWith(img);
+    }
+  }
+}
+
+
+// ── Tip jar ───────────────────────────────────────────────────────────────────
+function copyWallet() {
+  const addr = document.getElementById('solAddress').textContent;
+  navigator.clipboard.writeText(addr).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    const el = document.getElementById('solAddress');
+    const range = document.createRange();
+    range.selectNode(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+  });
+}
 </script>
+
+
+
+
+<!-- Fixed tip bar — always visible at the bottom of the screen -->
+<div class="tip-bar" id="tipJar">
+  <div class="tip-bar-inner">
+    <div class="tip-bar-left">
+      <div class="tip-bar-icon">🎮</div>
+      <span class="tip-bar-label">
+        <strong>Saved you some cash?</strong>
+        If FreeDrops helped you grab a free game, a small tip keeps the project alive.
+      </span>
+    </div>
+    <div class="tip-wallet">
+      <span class="tip-sol-badge">SOL</span>
+      <span class="tip-address" id="solAddress">GnFPSXyABYNVruNvkmidMda2RjLZCcTcyMHvVCk5bMqE</span>
+      <button class="tip-copy-btn" id="copyBtn" onclick="copyWallet()">Copy</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
