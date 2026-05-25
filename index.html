@@ -50,7 +50,7 @@
     font-family: 'Bebas Neue', sans-serif;
     font-size: 2.2rem; letter-spacing: 3px; line-height: 1;
     background: linear-gradient(100deg, var(--accent) 0%, var(--accent2) 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
   }
   .logo-sub { font-size: 0.62rem; color: var(--muted); letter-spacing: 4px; text-transform: uppercase; }
   .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
@@ -191,21 +191,23 @@
 
   .card-thumb { width: 100%; aspect-ratio: 16/7; object-fit: cover; background: var(--surface2); border-bottom: 1px solid var(--border); display: block; }
   .card-thumb-placeholder {
-    width: 100%; aspect-ratio: 16/7;
-    background: linear-gradient(135deg, var(--surface2), var(--surface3));
-    display: flex; align-items: center; justify-content: center;
-    border-bottom: 1px solid var(--border); font-size: 2rem; color: var(--border2);
-  }
+  width: 100%; aspect-ratio: 16/7;
+  background: linear-gradient(90deg, var(--surface2) 25%, rgba(255,255,255,0.04) 50%, var(--surface2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  display: flex; align-items: center; justify-content: center;
+  border-bottom: 1px solid var(--border); font-size: 1.1rem; color: var(--border2);
+}
 
   .card-body { padding: 15px 16px 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
-  .card-title { font-size: 0.9rem; font-weight: 600; line-height: 1.45; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .card-title { font-size: 0.9rem; font-weight: 600; line-height: 1.45; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
   /* ── Tags ──────────────────────────────────────────────────────────────────── */
   .card-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
   .tag { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.7px; text-transform: uppercase; padding: 3px 7px; border-radius: 5px; white-space: nowrap; }
   .tag-sub     { background: #1a1a2e; color: #8080cc; border: 1px solid #28284a; }
   .tag-new     { background: #0c2618; color: var(--green); border: 1px solid #183c28; }
-  .tag-hot     { background: #281200; color: var(--accent2); border: 1px solid #402000; }
+  .tag-hot { background: #281200; color: var(--accent2); border: 1px solid #402000; margin-left: 4px; }
   .tag-expired { background: #1a1a1a; color: #505050; border: 1px solid #2a2a2a; }
   .tag-steam   { background: #142030; color: #6ab4f5; border: 1px solid #204060; }
   .tag-epic    { background: #181818; color: #c0c0c0; border: 1px solid #303030; }
@@ -215,6 +217,7 @@
   .tag-origin  { background: #281400; color: #f08030; border: 1px solid #482400; }
   .tag-humble  { background: #281800; color: #f0a020; border: 1px solid #483000; }
   .tag-gp      { background: #0e2818; color: #34d984; border: 1px solid #1c4430; }
+  .tag-indiegala { background: #1a0a14; color: #e91e63; border: 1px solid #3a1028; }
 
   .card-time { font-size: 0.7rem; color: var(--muted); margin-left: auto; flex-shrink: 0; }
   .card-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 6px; }
@@ -228,6 +231,8 @@
   .btn-ghost:hover { border-color: var(--accent2); color: var(--accent2); transform: scale(1.03); }
   .btn-ghost.saved { border-color: rgba(52,217,132,0.4); color: var(--green); }
   .btn-ghost.saved:hover { border-color: var(--green); background: rgba(52,217,132,0.1); }
+  .btn-ghost img { transition: opacity 0.2s, filter 0.2s; }
+.btn-ghost:hover img { opacity: 1; filter: brightness(1.2) drop-shadow(0 0 5px rgba(255, 69, 0, 0.6)); }
   .btn-disabled { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); cursor: default; }
   .btn-disabled:hover { opacity: 1; transform: none; }
 
@@ -310,6 +315,7 @@
   letter-spacing: 1px;
   background: linear-gradient(135deg, #9945ff, #14f195);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   flex-shrink: 0;
 }
@@ -358,6 +364,54 @@
 .tip-dismiss:hover {
   color: var(--text);
 }
+
+[data-tooltip] {
+  position: relative;
+}
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.95);
+  background: rgba(20, 20, 24, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+[data-tooltip]::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 3px);
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px 5px 0 5px;
+  border-style: solid;
+  border-color: var(--border2) transparent transparent transparent;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 100;
+}
+[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+[data-tooltip]:hover::before {
+  opacity: 1;
+}
+
 </style>
 </head>
 <body>
@@ -485,6 +539,7 @@ const PLATFORMS = [
   { key:'origin',  label:'EA/Origin',cls:'tag-origin',  brackets:['[origin]','[ea]','(ea)'],    broad:['origin.com','ea app'] },
   { key:'humble',  label:'Humble',   cls:'tag-humble',  brackets:['[humble]','(humble)'],       broad:['humble bundle','humblebundle'] },
   { key:'steam',   label:'Steam',    cls:'tag-steam',   brackets:['[steam]','(steam)'],         broad:['steampowered','steamgifts','steam '] },
+  { key:'indiegala', label:'IndieGala', cls:'tag-indiegala', brackets:['[indiegala]','(indiegala)','[indie gala]'], broad:['indiegala.com','indie gala'] },
 ];
 const MAIN_PLATFORM_KEYS = ['steam','epic','itch','gog'];
 const faviconOf = d => `https://icons.duckduckgo.com/ip3/${d}.ico`;
@@ -494,6 +549,8 @@ const PLATFORM_ICONS = {
   itch:  faviconOf('itch.io'),
   gog:   faviconOf('gog.com'),
 };
+
+const REDDIT_ICON = 'https://cdn.simpleicons.org/reddit/FF4500';
 
 // ══════════════════════════════════════════════════════════════════════════════
 // CACHE
@@ -646,7 +703,7 @@ function normaliseGPGame(g) {
   const endLabel = g.end_date && g.end_date !== 'N/A' ? `ends ${g.end_date.split(' ')[0]}` : '';
   return {
     id: String(g.id), title: g.title,
-    platform: detectPlatformFromGP(g.platforms),
+        platform: detectPlatformFromGP(g.platforms) || detectPlatform(g.title, '', g.open_giveaway_url || '', ''),
     thumb: g.thumbnail || g.image || null, gameName: g.title,
     url: g.open_giveaway_url, altUrl: null, score: null,
     timeLabel: endLabel,
@@ -683,16 +740,18 @@ function renderCard(game, idx) {
   const expTag  = game.expired ? `<span class="tag tag-expired">⏰ Expired</span>` : '';
   const timeEl  = game.timeLabel ? `<span class="card-time">${esc(game.timeLabel)}</span>` : '';
   
-  const metaLeft = game.score !== null
+  const metaLeft = game.score > 0
     ? `<span class="card-meta-left"><svg width="11" height="11" viewBox="0 0 24 24" fill="#ff4d00"><path d="M12 4l8 8H4z"/></svg>${game.score.toLocaleString()}</span>`
     : game.worth ? `<span class="card-meta-left" style="color:var(--muted)">${game.worth==='Free'?'':'was '}<strong style="color:var(--accent2)">${esc(game.worth)}</strong></span>` : '';
 
   let buttons;
   if (game.expired) {
     buttons = `<span class="btn btn-disabled">Ended</span>`;
-  } else if (game.altUrl) {
-    buttons = `<a class="btn btn-ghost" href="${esc(game.altUrl)}" target="_blank" rel="noopener">Reddit</a>
-               <a class="btn btn-primary" href="${esc(game.url)}" target="_blank" rel="noopener">Open Store →</a>`;
+      } else if (game.altUrl) {
+    buttons = `<a class="btn btn-ghost" href="${esc(game.altUrl)}" target="_blank" rel="noopener" title="View Reddit discussion">
+      <img src="${REDDIT_ICON}" width="14" height="14" alt="" style="display:block; opacity:0.8;">
+    </a>
+    <a class="btn btn-primary" href="${esc(game.url)}" target="_blank" rel="noopener">Open Store →</a>`;
   } else {
     buttons = `<a class="btn btn-primary" href="${esc(game.url)}" target="_blank" rel="noopener">${game.source==='gamerpower' ? 'Claim Free →' : 'View →'}</a>`;
   }
@@ -711,7 +770,7 @@ function renderCard(game, idx) {
     <div class="card${game.expired ? ' expired' : ''}" style="animation-delay:${idx * 0.04}s">
       ${thumbHtml}
       <div class="card-body">
-        <div class="card-title">${esc(game.title)}</div>
+        <div class="card-title">${esc(game.source === 'reddit' ? (game.gameName || game.title) : game.title)}</div>
         <div class="card-meta">${sourceTag}${platTag}${ageTag}${expTag}${timeEl}</div>
         <div class="card-footer">${metaLeft}<div class="btn-group">${buttons}</div></div>
       </div>
@@ -751,7 +810,8 @@ function renderControlsBar(games, activeSection, onSectionFn, source) {
       const cnt = filterBySection(games, s.key).filter(g => s.key === 'expired' || !Filters.isDLC(g)).length;
       if (cnt === 0 && s.key !== 'all') return '';
       const icon = PLATFORM_ICONS[s.key] ? `<img src="${PLATFORM_ICONS[s.key]}" class="pnav-icon" alt="" onerror="this.style.display='none'">` : '';
-      return `<button class="pnav-btn${activeSection === s.key ? ' active' : ''}" onclick="${onSectionFn}('${s.key}')">
+            const tooltipAttr = s.key === 'others' ? 'data-tooltip="Ubisoft, EA, Humble, IndieGala & more"' : '';
+      return `<button class="pnav-btn${activeSection === s.key ? ' active' : ''}" onclick="${onSectionFn}('${s.key}')" ${tooltipAttr}>
         ${icon}${s.label}<span class="pnav-count">${cnt}</span>
       </button>`;
     }).join('');
@@ -978,8 +1038,11 @@ const Reddit = {
         if (stale) { this._games = stale.data; this.render(true, stale.ts); return; }
         showError('All requests failed. Check your internet connection.'); return;
       }
-      Cache.set(CFG.cacheKeyReddit, all);
-      this._games = all;
+      const active = all.filter(g => !g.expired);
+      const expired = all.filter(g => g.expired).slice(0, 12);
+      const trimmed = [...active, ...expired].sort((a, b) => b.rawAge - a.rawAge);
+      Cache.set(CFG.cacheKeyReddit, trimmed);
+      this._games = trimmed;
       this.render(false, null);
     } catch (e) { if (e?.name !== 'AbortError') showError(e.message); }
   },
@@ -1103,7 +1166,7 @@ const App = {
 };
 
 // ══════════════════════════════════════════════════════════════════════════════
-// TIP JAR  (auto-reappears after 7 days)
+// TIP JAR  (auto-reappears after 1 days)
 // ══════════════════════════════════════════════════════════════════════════════
 const TipJar = {
   // Days until the tip jar reappears after being dismissed
