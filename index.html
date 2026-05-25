@@ -3,1057 +3,1163 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>FreeDrops — Reddit Game Giveaways</title>
+<title>FreeDrops — Free Game Giveaways</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
+  /* ── Design Tokens ─────────────────────────────────────────────────────────── */
   :root {
-    --bg: #0d0d0f; --surface: #16161a; --surface2: #1e1e24;
-    --border: #2a2a35; --accent: #ff4d00; --accent2: #ff8c42;
-    --text: #f0eff4; --muted: #7c7c8a; --green: #39d98a;
+    --bg:        #0c0c0f;
+    --surface:   #141418;
+    --surface2:  #1c1c22;
+    --surface3:  #242430;
+    --border:    #28283a;
+    --border2:   #32324a;
+    --accent:    #ff4d00;
+    --accent2:   #ff8c42;
+    --text:      #eeedf4;
+    --text2:     #a0a0b8;
+    --muted:     #606078;
+    --green:     #34d984;
+    --radius:    12px;
+    --radius-sm: 7px;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding-bottom: 100px; }
 
-  /* ── Header ── */
-  .header {
-    background: linear-gradient(135deg, #0d0d0f 0%, #1a0a00 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 28px 32px 20px;
-    display: flex; align-items: flex-end; gap: 16px;
-    position: sticky; top: 0; z-index: 10;
-    backdrop-filter: blur(12px);
-    flex-wrap: wrap;
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 110px;
+    background-image: radial-gradient(ellipse at 20% 0%, #1a0800 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 0%, #0a0a1a 0%, transparent 60%);
   }
-  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; letter-spacing: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
-  .logo-sub { font-size: 0.7rem; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; padding-bottom: 4px; }
-  .header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
-  .live-badge { background: var(--accent); color: #fff; font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
-  .cache-note { font-size: 0.7rem; color: var(--muted); }
-  .refresh-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 18px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
-  .refresh-btn:hover { background: var(--border); border-color: var(--accent); color: var(--accent); }
-  .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-  .refresh-btn.spinning svg { animation: spin 0.8s linear infinite; }
+
+  /* ── Sticky Header ─────────────────────────────────────────────────────────── */
+  .header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(12, 12, 15, 0.75);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 22px 36px 18px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .logo-wrap { display: flex; flex-direction: column; gap: 1px; }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem; letter-spacing: 3px; line-height: 1;
+    background: linear-gradient(100deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .logo-sub { font-size: 0.62rem; color: var(--muted); letter-spacing: 4px; text-transform: uppercase; }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+  .cache-note { font-size: 0.68rem; color: var(--muted); }
+  .live-badge {
+    background: var(--accent); color: #fff;
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 1px;
+    padding: 3px 10px; border-radius: 20px; text-transform: uppercase;
+  }
+  .value-badge {
+    background: linear-gradient(135deg, rgba(52,217,132,0.15), rgba(52,217,132,0.05));
+    border: 1px solid rgba(52,217,132,0.3);
+    color: var(--green);
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.5px;
+    padding: 4px 11px; border-radius: 20px;
+    white-space: nowrap;
+  }
+  .refresh-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text2); padding: 7px 16px; border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 600;
+    cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .refresh-btn:hover { border-color: var(--accent2); color: var(--accent2); background: var(--surface3); }
+  .refresh-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .refresh-btn.spinning svg { animation: spin 0.75s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ── Main ── */
-  .main { padding: 28px 32px; max-width: 1100px; margin: 0 auto; }
-  .section-label { font-size: 0.72rem; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
-  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-  .count-info { font-size: 0.78rem; color: var(--muted); margin-bottom: 18px; margin-top: -8px; }
-  .count-info span { color: var(--accent2); font-weight: 600; }
+  /* ── Main Layout ───────────────────────────────────────────────────────────── */
+  .main { max-width: 1140px; margin: 0 auto; padding: 32px 36px; }
 
-  /* ── Platform nav tabs ── */
-  .platform-nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
-  .pnav-btn { background: var(--surface); border: 1px solid var(--border); color: var(--muted); padding: 7px 16px; border-radius: 20px; font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.18s; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-  .pnav-btn:hover { border-color: var(--accent2); color: var(--text); }
-  .pnav-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .pnav-btn .pnav-count { background: rgba(255,255,255,0.18); border-radius: 10px; padding: 1px 7px; font-size: 0.68rem; }
-  .pnav-btn:not(.active) .pnav-count { background: var(--surface2); color: var(--muted); }
-  .pnav-icon { width: 16px; height: 16px; object-fit: contain; border-radius: 3px; flex-shrink: 0; image-rendering: -webkit-optimize-contrast; }
-
-  /* Platform section block */
-  .platform-section { margin-bottom: 40px; }
-
-  /* ── Grid & Cards ── */
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
-
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s; animation: fadeIn 0.4s ease both; position: relative; }
-  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); opacity: 0; transition: opacity 0.2s; z-index: 1; }
-  .card:hover { transform: translateY(-3px); border-color: #3a3a48; box-shadow: 0 8px 32px rgba(0,0,0,0.45); }
-  .card:hover::before { opacity: 1; }
-  .card.expired { opacity: 0.42; filter: grayscale(0.65); }
-  .card.expired::before { display: none; }
-  .card.expired:hover { transform: none; box-shadow: none; border-color: var(--border); }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-
-  /* Thumbnail */
-  .card-thumb {
-    width: 100%; aspect-ratio: 16/7; object-fit: cover;
-    background: var(--surface2);
-    display: block; border-bottom: 1px solid var(--border);
-  }
-  .card-thumb-placeholder {
-    width: 100%; aspect-ratio: 16/7;
-    background: linear-gradient(135deg, var(--surface2) 0%, #1a1a22 100%);
-    display: flex; align-items: center; justify-content: center;
-    border-bottom: 1px solid var(--border);
-    font-size: 2rem; color: var(--border);
-    flex-shrink: 0;
-  }
-
-  /* Card body */
-  .card-body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 11px; flex: 1; }
-  .card-title { font-size: 0.92rem; font-weight: 600; line-height: 1.4; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-
-  /* Tags */
-  .card-meta { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
-  .tag { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 3px 8px; border-radius: 5px; white-space: nowrap; }
-  .tag-sub     { background: #1e1e30; color: #8888cc; border: 1px solid #2a2a44; }
-  .tag-new     { background: #0d2a1a; color: var(--green); border: 1px solid #1a4a2e; }
-  .tag-hot     { background: #2a1200; color: var(--accent2); border: 1px solid #4a2a00; }
-  .tag-expired { background: #1e1e1e; color: #555; border: 1px solid #2e2e2e; }
-  .tag-steam   { background: #1a2a3a; color: #6ab4f5; border: 1px solid #2a4a6a; }
-  .tag-epic    { background: #1a1a1a; color: #c8c8c8; border: 1px solid #3a3a3a; }
-  .tag-gog     { background: #1a1a2e; color: #a78bfa; border: 1px solid #2e2e50; }
-  .tag-itch    { background: #2e1218; color: #fa6e79; border: 1px solid #4e2030; }
-  .tag-ubisoft { background: #0d1f2e; color: #4fc3f7; border: 1px solid #1a3a50; }
-  .tag-origin  { background: #2e1500; color: #f48a2e; border: 1px solid #4e2800; }
-  .tag-humble  { background: #2e1a00; color: #f5a623; border: 1px solid #4e3000; }
-
-  .card-time { font-size: 0.74rem; color: var(--muted); margin-left: auto; flex-shrink: 0; }
-  .card-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 4px; }
-  .upvotes { font-size: 0.76rem; color: var(--muted); display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
-
-  .btn-group { display: flex; gap: 7px; align-items: center; }
-  .claim-btn { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 700; padding: 7px 14px; border: none; border-radius: 7px; cursor: pointer; text-decoration: none; display: inline-block; letter-spacing: 0.3px; transition: opacity 0.15s, transform 0.1s; white-space: nowrap; }
-  .claim-btn:hover { opacity: 0.88; transform: scale(1.03); }
-  .claim-btn.secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-  .claim-btn.secondary:hover { border-color: var(--accent2); color: var(--accent2); }
-  .claim-btn.disabled-btn { background: #1e1e1e; color: #444; cursor: not-allowed; border: 1px solid #2a2a2a; }
-  .claim-btn.disabled-btn:hover { transform: none; opacity: 1; }
-
-  /* ── States ── */
-  .state-box { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 64px 32px; gap: 16px; color: var(--muted); text-align: center; }
-  .state-box .icon { font-size: 3rem; }
-  .state-box p { font-size: 0.9rem; line-height: 1.6; max-width: 480px; }
-  .state-box strong { color: var(--text); }
-  .error-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 9px 20px; border-radius: 8px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; margin-top: 8px; transition: border-color 0.2s; }
-  .error-btn:hover { border-color: var(--accent); }
-
-  /* ── Skeletons ── */
-  .skeleton-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
-  .skeleton-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-  .skel { background: linear-gradient(90deg, var(--surface2) 25%, #22222e 50%, var(--surface2) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
-  @keyframes shimmer { to { background-position: -200% 0; } }
-  .skel-img  { width: 100%; aspect-ratio: 16/7; }
-  .skel-body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 10px; }
-  .skel-line { height: 13px; border-radius: 5px; }
-  .skel-tag  { height: 20px; width: 70px; border-radius: 5px; }
-  .skel-btn  { height: 32px; width: 100px; border-radius: 7px; margin-left: auto; }
-
-
-  .tip-jar-left { display: flex; align-items: center; gap: 12px; }
-  .tip-jar-icon { font-size: 1.4rem; flex-shrink: 0; }
-  .tip-jar-text { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
-  .tip-jar-text strong { color: var(--text); display: block; margin-bottom: 2px; }
-  .tip-wallet {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 8px 14px;
-    flex-wrap: wrap;
-  }
-  .tip-sol-badge {
-    font-size: 0.7rem; font-weight: 700; letter-spacing: 1px;
-    background: linear-gradient(135deg, #9945ff, #14f195);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    flex-shrink: 0;
-  }
-  .tip-address {
-    font-family: 'Courier New', monospace; font-size: 0.75rem;
-    color: var(--muted); letter-spacing: 0.3px;
-    max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .tip-copy-btn {
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--muted); padding: 5px 12px; border-radius: 6px;
-    font-family: 'DM Sans', sans-serif; font-size: 0.72rem; font-weight: 600;
-    cursor: pointer; transition: all 0.18s; white-space: nowrap; flex-shrink: 0;
-  }
-  .tip-copy-btn:hover { border-color: #9945ff; color: #9945ff; }
-  .tip-copy-btn.copied { border-color: var(--green); color: var(--green); }
-
-  /* ── Source switcher ── */
+  /* ── Source Switcher ───────────────────────────────────────────────────────── */
   .source-nav {
-    display: flex; gap: 8px; margin-bottom: 24px;
-    border-bottom: 1px solid var(--border); padding-bottom: 16px;
+    display: flex; gap: 6px; flex-wrap: wrap;
+    padding-bottom: 20px; margin-bottom: 20px;
+    border-bottom: 1px solid var(--border);
   }
   .source-btn {
     background: var(--surface); border: 1px solid var(--border);
-    color: var(--muted); padding: 8px 18px; border-radius: 8px;
-    font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 600;
-    cursor: pointer; transition: all 0.18s; display: flex; align-items: center; gap: 7px;
+    color: var(--muted); padding: 8px 20px; border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 600;
+    cursor: pointer; transition: all 0.18s; display: flex; align-items: center; gap: 8px;
   }
-  .source-btn:hover { border-color: var(--accent2); color: var(--text); }
+  .source-btn:hover { border-color: var(--border2); color: var(--text); }
   .source-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-  /* GamerPower card — same as Reddit card */
-  .gp-source-badge {
-    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
-    padding: 3px 8px; border-radius: 5px; white-space: nowrap;
-    background: #1a2a1a; color: #4ade80; border: 1px solid #2a4a2a;
+  /* ── Count Info & Backlog Search ───────────────────────────────────────────── */
+  .count-info { font-size: 0.76rem; color: var(--muted); margin-bottom: 16px; }
+  .count-info strong { color: var(--accent2); font-weight: 600; }
+  
+  .search-input {
+    flex: 1; background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); padding: 9px 16px; border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 0.85rem; outline: none;
+    transition: border-color 0.2s;
   }
-  .gp-worth { font-size: 0.75rem; color: var(--muted); }
-  .gp-worth span { color: var(--accent2); font-weight: 600; }
+  .search-input:focus { border-color: var(--accent2); }
 
-  /* ── Fixed tip bar ── */
-  .tip-bar {
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    z-index: 100;
-    padding: 14px 20px;
-    width: calc(100% - 64px);
-    max-width: 1100px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  /* ── Controls Bar ──────────────────────────────────────────────────────────── */
+  .controls-bar {
+    display: flex; align-items: center; gap: 10px;
+    flex-wrap: wrap; margin-bottom: 24px;
   }
-  .tip-bar-inner {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 16px; flex-wrap: wrap;
+  .platform-nav { display: flex; gap: 7px; flex-wrap: wrap; flex: 1; }
+  .pnav-btn {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--muted); padding: 6px 14px; border-radius: 20px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 600;
+    cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px;
+    white-space: nowrap;
   }
-  .tip-bar-left { display: flex; align-items: center; gap: 12px; }
-  .tip-bar-icon { font-size: 1.4rem; flex-shrink: 0; }
-  .tip-bar-label {
-    font-size: 0.82rem; color: var(--muted); font-weight: 500; line-height: 1.5;
+  .pnav-btn:hover { border-color: var(--border2); color: var(--text); }
+  .pnav-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .pnav-count {
+    padding: 1px 6px; border-radius: 10px;
+    font-size: 0.65rem; background: rgba(255,255,255,0.15);
   }
-  .tip-bar-label strong { color: var(--text); display: block; margin-bottom: 2px; }
+  .pnav-btn:not(.active) .pnav-count { background: var(--surface3); color: var(--muted); }
+  .pnav-icon { width: 15px; height: 15px; object-fit: contain; border-radius: 3px; flex-shrink: 0; }
+
+  .sort-select {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text2); padding: 6px 10px; border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 0.74rem; font-weight: 600;
+    cursor: pointer; transition: border-color 0.18s, color 0.18s;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23606078' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 9px center;
+    padding-right: 28px; white-space: nowrap;
+  }
+  .sort-select:hover { border-color: var(--border2); color: var(--text); }
+  .sort-select:focus { outline: none; border-color: var(--accent2); color: var(--text); }
+
+  .toggle-wrap {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 0.74rem; font-weight: 600; color: var(--muted);
+    cursor: pointer; white-space: nowrap; user-select: none;
+    transition: color 0.15s;
+  }
+  .toggle-wrap:hover { color: var(--text2); }
+  .toggle-wrap input[type="checkbox"] { display: none; }
+  .toggle-track {
+    width: 32px; height: 18px; border-radius: 9px;
+    background: var(--surface3); border: 1px solid var(--border);
+    position: relative; transition: background 0.2s, border-color 0.2s; flex-shrink: 0;
+  }
+  .toggle-track::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--muted); transition: transform 0.2s, background 0.2s;
+  }
+  .toggle-wrap input:checked + .toggle-track { background: var(--accent); border-color: var(--accent); }
+  .toggle-wrap input:checked + .toggle-track::after { transform: translateX(14px); background: #fff; }
+
+  /* ── Card Grid ─────────────────────────────────────────────────────────────── */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+
+  /* ── Card ──────────────────────────────────────────────────────────────────── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+    display: flex; flex-direction: column; position: relative;
+    transition: transform 0.25s cubic-bezier(.22,.68,0,1.2),
+                box-shadow 0.25s ease, border-color 0.2s ease;
+    animation: fadeUp 0.35s ease both;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity: 0; transition: opacity 0.2s; z-index: 1;
+  }
+  .card:hover { transform: translateY(-4px); border-color: var(--border2); box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,77,0,0.08); }
+  .card:hover::before { opacity: 1; }
+  .card.expired { opacity: 0.38; filter: grayscale(0.7); pointer-events: none; }
+  .card.expired::before { display: none; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+  .card-thumb { width: 100%; aspect-ratio: 16/7; object-fit: cover; background: var(--surface2); border-bottom: 1px solid var(--border); display: block; }
+  .card-thumb-placeholder {
+    width: 100%; aspect-ratio: 16/7;
+    background: linear-gradient(135deg, var(--surface2), var(--surface3));
+    display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid var(--border); font-size: 2rem; color: var(--border2);
+  }
+
+  .card-body { padding: 15px 16px 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .card-title { font-size: 0.9rem; font-weight: 600; line-height: 1.45; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* ── Tags ──────────────────────────────────────────────────────────────────── */
+  .card-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .tag { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.7px; text-transform: uppercase; padding: 3px 7px; border-radius: 5px; white-space: nowrap; }
+  .tag-sub     { background: #1a1a2e; color: #8080cc; border: 1px solid #28284a; }
+  .tag-new     { background: #0c2618; color: var(--green); border: 1px solid #183c28; }
+  .tag-hot     { background: #281200; color: var(--accent2); border: 1px solid #402000; }
+  .tag-expired { background: #1a1a1a; color: #505050; border: 1px solid #2a2a2a; }
+  .tag-steam   { background: #142030; color: #6ab4f5; border: 1px solid #204060; }
+  .tag-epic    { background: #181818; color: #c0c0c0; border: 1px solid #303030; }
+  .tag-gog     { background: #18182e; color: #a07afa; border: 1px solid #2c2c50; }
+  .tag-itch    { background: #2a1018; color: #fa607a; border: 1px solid #481828; }
+  .tag-ubisoft { background: #0c1c2c; color: #4ab8f8; border: 1px solid #183448; }
+  .tag-origin  { background: #281400; color: #f08030; border: 1px solid #482400; }
+  .tag-humble  { background: #281800; color: #f0a020; border: 1px solid #483000; }
+  .tag-gp      { background: #0e2818; color: #34d984; border: 1px solid #1c4430; }
+
+  .card-time { font-size: 0.7rem; color: var(--muted); margin-left: auto; flex-shrink: 0; }
+  .card-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 6px; }
+  .card-meta-left { font-size: 0.72rem; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+  .btn-group { display: flex; gap: 6px; align-items: center; margin-left: auto; }
+
+  .btn { display: inline-flex; align-items: center; font-family: 'DM Sans', sans-serif; font-size: 0.76rem; font-weight: 700; padding: 7px 13px; border-radius: var(--radius-sm); border: none; cursor: pointer; text-decoration: none; white-space: nowrap; transition: opacity 0.15s, transform 0.12s, color 0.2s, border-color 0.2s; letter-spacing: 0.2px; }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; }
+  .btn-primary:hover { opacity: 0.88; transform: scale(1.03); }
+  .btn-ghost { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--accent2); color: var(--accent2); transform: scale(1.03); }
+  .btn-ghost.saved { border-color: rgba(52,217,132,0.4); color: var(--green); }
+  .btn-ghost.saved:hover { border-color: var(--green); background: rgba(52,217,132,0.1); }
+  .btn-disabled { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); cursor: default; }
+  .btn-disabled:hover { opacity: 1; transform: none; }
+
+  /* ── Skeletons ─────────────────────────────────────────────────────────────── */
+  .skeleton-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+  .skeleton-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .skel { background: linear-gradient(90deg, var(--surface2) 25%, var(--surface3) 50%, var(--surface2) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  .skel-img  { width: 100%; aspect-ratio: 16/7; }
+  .skel-body { padding: 15px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .skel-line { height: 12px; border-radius: 4px; }
+  .skel-tag  { height: 20px; width: 65px; border-radius: 4px; }
+  .skel-btn  { height: 30px; width: 95px; border-radius: var(--radius-sm); margin-left: auto; }
+
+  /* ── States ────────────────────────────────────────────────────────────────── */
+  .state-box { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 32px; gap: 14px; color: var(--muted); text-align: center; }
+  .state-box .icon { font-size: 2.8rem; }
+  .state-box p { font-size: 0.88rem; line-height: 1.65; max-width: 460px; }
+  .state-box strong { color: var(--text); }
+  .btn-retry { margin-top: 6px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 20px; border-radius: var(--radius-sm); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; transition: border-color 0.18s; }
+  .btn-retry:hover { border-color: var(--accent); }
+
+  /* ── Tip Bar ───────────────────────────────────────────────────────────────── */
+.tip-bar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 48px);
+  max-width: 1100px;
+  background: rgba(20, 20, 24, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+  z-index: 200;
+  padding: 13px 18px;
+  transition: opacity 0.3s, transform 0.3s;
+}
+.tip-bar.hidden {
+  opacity: 0;
+  transform: translateX(-50%) translateY(20px);
+  pointer-events: none;
+}
+.tip-bar-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.tip-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.tip-text {
+  font-size: 0.8rem;
+  color: var(--text2);
+  line-height: 1.4;
+}
+.tip-text strong {
+  color: var(--text);
+  display: block;
+  font-size: 0.82rem;
+}
+.tip-wallet {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 12px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+.tip-sol {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #9945ff, #14f195);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  flex-shrink: 0;
+}
+.tip-address {
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tip-copy {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+  flex-shrink: 0;
+}
+.tip-copy:hover {
+  border-color: #9945ff;
+  color: #c084fc;
+}
+.tip-copy.ok {
+  border-color: var(--green);
+  color: var(--green);
+}
+.tip-dismiss {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  line-height: 1;
+  padding: 4px;
+  transition: color 0.15s;
+  margin-left: 4px;
+}
+.tip-dismiss:hover {
+  color: var(--text);
+}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div>
+<header class="header">
+  <div class="logo-wrap">
     <div class="logo">FREEDROPS</div>
-    <div class="logo-sub">Reddit Game Giveaways</div>
+    <div class="logo-sub">Free Game Giveaways</div>
   </div>
   <div class="header-right">
     <span class="cache-note" id="cacheNote" style="display:none"></span>
+    <span class="value-badge" id="valueBadge" style="display:none"></span>
     <span class="live-badge" id="liveCount" style="display:none"></span>
-    <button class="refresh-btn" id="refreshBtn" onclick="_currentSource==='gamerpower' ? loadGamerPower(true) : loadGiveaways(true)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <button class="refresh-btn" id="refreshBtn" onclick="App.refresh()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
         <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
       </svg>
       Refresh
     </button>
   </div>
+</header>
 
-</div>
-
-<div class="main">
-  <div class="source-nav">
-    <button class="source-btn active" id="srcGamerpower" onclick="switchSource('gamerpower')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M21 6H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1zm-10 7H9v2H7v-2H5v-2h2V9h2v2h2v2zm4.5 1a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-3a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
+<main class="main">
+  <nav class="source-nav">
+    <button class="source-btn active" id="srcGamerpower" onclick="App.switchSource('gamerpower')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M21 6H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1zm-10 7H9v2H7v-2H5v-2h2V9h2v2h2v2zm4.5 1a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-3a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
       GamerPower
     </button>
-    <button class="source-btn" id="srcReddit" onclick="switchSource('reddit')">
-      <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10c0 5.52 4.48 10 10 10s10-4.48 10-10zm-7.41-1.59a1.5 1.5 0 1 1 2.12 2.12 1.5 1.5 0 0 1-2.12-2.12zm-5.18 0a1.5 1.5 0 1 1 2.12 2.12 1.5 1.5 0 0 1-2.12-2.12zM10 15.5c-2.33 0-4.32-1.45-5.12-3.5h10.24c-.8 2.05-2.79 3.5-5.12 3.5z"/></svg>
+    <button class="source-btn" id="srcReddit" onclick="App.switchSource('reddit')">
+      <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10c0 5.52 4.48 10 10 10s10-4.48 10-10zm-7.41-1.59a1.5 1.5 0 1 1 2.12 2.12 1.5 1.5 0 0 1-2.12-2.12zm-5.18 0a1.5 1.5 0 1 1 2.12 2.12 1.5 1.5 0 0 1-2.12-2.12zM10 15.5c-2.33 0-4.32-1.45-5.12-3.5h10.24c-.8 2.05-2.79 3.5-5.12 3.5z"/></svg>
       Reddit
     </button>
-  </div>
+    <button class="source-btn" id="srcBacklog" onclick="App.switchSource('backlog')" style="margin-left: auto;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+      My Backlog
+    </button>
+  </nav>
   <div id="countInfo" class="count-info" style="display:none"></div>
   <div id="content"></div>
+</main>
+
+<div class="tip-bar" id="tipBar">
+  <div class="tip-bar-inner">
+    <div class="tip-icon">🎮</div>
+    <div class="tip-text">
+      <strong>Saved you some cash?</strong>
+      If FreeDrops helped you grab a free game, a small tip keeps the project alive.
+    </div>
+    <div class="tip-wallet">
+      <span class="tip-sol">SOL</span>
+      <span class="tip-address" id="solAddress">GnFPSXyABYNVruNvkmidMda2RjLZCcTcyMHvVCk5bMqE</span>
+      <button class="tip-copy" id="copyBtn" onclick="TipJar.copy()">Copy</button>
+    </div>
+    <button class="tip-dismiss" onclick="TipJar.dismiss()" title="Dismiss">✕</button>
+  </div>
 </div>
 
 <script>
-// ── Config ────────────────────────────────────────────────────────────────────
-const MAX_AGE_HOURS   = 720; // 30 days
-const CACHE_KEY       = 'freedrops_cache_v2'; // bump version on breaking changes
-const CACHE_TTL_MS    = 15 * 60 * 1000; // 15 minutes
+'use strict';
 
-const SUBREDDITS = [
-  { name: 'FreeGameFindings', endpoint: 'new', trustAll: true  },
-  { name: 'GameGiveaways',    endpoint: 'new', trustAll: false },
-  { name: 'FreeGamesOnSteam', endpoint: 'new', trustAll: false },
-];
+// ══════════════════════════════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════════════════════════════
+const CFG = {
+  maxAgeHours:    720,
+  cacheTTL:       15 * 60e3,
+  cacheKeyReddit: 'fd_reddit_v3',
+  cacheKeyGP:     'fd_gp_v3',
+  subreddits: [
+    { name: 'FreeGameFindings', endpoint: 'new', trustAll: true  },
+    { name: 'GameGiveaways',    endpoint: 'new', trustAll: false },
+    { name: 'FreeGamesOnSteam', endpoint: 'new', trustAll: false },
+  ],
+  includeKw: [
+    'free to keep','free game','100% off','giveaway','raffle','steam key',
+    'epic games free','free key','free copy','gifting','itch.io','gog free',
+    'free on steam','free on epic','free on gog','free on ubisoft','free on origin',
+    'claim for free','free pc game','[free]','(free)','[game]','[dlc]','[alpha]','[beta]',
+  ],
+  excludeKw: [
+    'sale','discount','% off','percent off','deal','cheap','humble choice',
+    'humble bundle','coupon','promo code','reduced','on sale','price drop',
+    'weekend deal','daily deal','flash sale','limited time deal','best deal',
+    'lowest price','pay what you want','fanatical','indiegala bundle','greenmangaming',
+  ],
+  excludeExcept:  ['100% off','free bundle','humble free','free humble'],
+  expiredMarkers: ['[expired]','(expired)','expired','[ended]','(ended)','[over]','[closed]'],
+  dlcPatterns:    ['[dlc]','(dlc)',' dlc','[beta]','(beta)',' beta','[alpha]','(alpha)',' alpha',' pack'],
+};
 
-const INCLUDE_KEYWORDS = [
-  'free to keep','free game','100% off','giveaway','raffle','steam key',
-  'epic games free','free key','free copy','gifting','itch.io','gog free',
-  'free on steam','free on epic','free on gog','free on ubisoft','free on origin',
-  'claim for free','free pc game','[free]','(free)','[game]','[dlc]','[alpha]','[beta]'
-];
-const EXCLUDE_KEYWORDS = [
-  'sale','discount','% off','percent off','deal','cheap','humble choice',
-  'humble bundle','coupon','promo code','reduced','on sale','price drop',
-  'weekend deal','daily deal','flash sale','limited time deal','best deal',
-  'lowest price','pay what you want','fanatical','indiegala bundle','greenmangaming'
-];
-const EXCLUDE_EXCEPTIONS = ['100% off','free bundle','humble free','free humble'];
-const EXPIRED_MARKERS    = ['[expired]','(expired)','expired','[ended]','(ended)','[over]','[closed]'];
+// ══════════════════════════════════════════════════════════════════════════════
+// UNIFIED FILTER STATE
+// ══════════════════════════════════════════════════════════════════════════════
+const Filters = {
+  hideDLC:  false,
+  sortMode: 'newest',
 
+  onChange() { App._currentSource()._paint(); },
+  isDLC(game) {
+    if (!this.hideDLC) return false;
+    const t = game.title.toLowerCase();
+    return CFG.dlcPatterns.some(p => t.includes(p));
+  },
+  applySort(games, source) {
+    if (source === 'reddit' && this.sortMode === 'top') {
+      return [...games].sort((a, b) => (b.score || 0) - (a.score || 0));
+    }
+    if (source === 'gamerpower' && this.sortMode === 'value') {
+      const parse = w => parseFloat((w || '$0').replace(/[^0-9.]/g, '')) || 0;
+      return [...games].sort((a, b) => parse(b.worth) - parse(a.worth));
+    }
+    return games;
+  },
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PLATFORM DEFINITIONS
+// ══════════════════════════════════════════════════════════════════════════════
 const PLATFORMS = [
-  // Epic must come before Steam — "epic games" titles sometimes also mention steam
-  { key:'epic',    label:'⚡ Epic',     cls:'tag-epic',    patterns:['[epic]','(epic)','[egs]','epic games','epicgames','epic game','epic store','epic mega','store.epicgames','epicgames.com','egs free'] },
-  { key:'gog',     label:'🌌 GOG',      cls:'tag-gog',     patterns:['[gog]','(gog)','gog.com','gog '] },
-  { key:'itch',    label:'🎲 Itch.io',  cls:'tag-itch',    patterns:['[itch]','(itch)','itch.io'] },
-  { key:'ubisoft', label:'🔷 Ubisoft',  cls:'tag-ubisoft', patterns:['[ubisoft]','(ubisoft)','ubisoft connect','uplay'] },
-  { key:'origin',  label:'🔶 EA/Origin',cls:'tag-origin',  patterns:['[origin]','[ea]','(ea)','origin.com','ea app'] },
-  { key:'humble',  label:'🎁 Humble',   cls:'tag-humble',  patterns:['[humble]','(humble)','humble bundle','humblebundle'] },
-  // Steam last — its pattern 'steam' is broad and would swallow everything above
-  { key:'steam',   label:'🎮 Steam',    cls:'tag-steam',   patterns:['[steam]','(steam)','steampowered','steam ','steamgifts'] },
+  { key:'epic',    label:'Epic',     cls:'tag-epic',    brackets:['[epic]','(epic)','[egs]'],   broad:['epic games','epicgames','epic game','epic mega','epicgames.com','egs free'] },
+  { key:'gog',     label:'GOG',      cls:'tag-gog',     brackets:['[gog]','(gog)'],             broad:['gog.com','gog '] },
+  { key:'itch',    label:'Itch.io',  cls:'tag-itch',    brackets:['[itch]','(itch)','itch.io'], broad:[] },
+  { key:'ubisoft', label:'Ubisoft',  cls:'tag-ubisoft', brackets:['[ubisoft]','(ubisoft)'],     broad:['ubisoft connect','uplay'] },
+  { key:'origin',  label:'EA/Origin',cls:'tag-origin',  brackets:['[origin]','[ea]','(ea)'],    broad:['origin.com','ea app'] },
+  { key:'humble',  label:'Humble',   cls:'tag-humble',  brackets:['[humble]','(humble)'],       broad:['humble bundle','humblebundle'] },
+  { key:'steam',   label:'Steam',    cls:'tag-steam',   brackets:['[steam]','(steam)'],         broad:['steampowered','steamgifts','steam '] },
 ];
+const MAIN_PLATFORM_KEYS = ['steam','epic','itch','gog'];
+const faviconOf = d => `https://icons.duckduckgo.com/ip3/${d}.ico`;
+const PLATFORM_ICONS = {
+  steam: faviconOf('store.steampowered.com'),
+  epic:  faviconOf('epicgames.com'),
+  itch:  faviconOf('itch.io'),
+  gog:   faviconOf('gog.com'),
+};
 
-// ── Cache ─────────────────────────────────────────────────────────────────────
-function saveCache(posts) {
-  try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), posts }));
-  } catch { /* storage full or unavailable */ }
-}
+// ══════════════════════════════════════════════════════════════════════════════
+// CACHE
+// ══════════════════════════════════════════════════════════════════════════════
+const Cache = {
+  get(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
+      const { ts, data } = JSON.parse(raw);
+      return { data, ts, stale: Date.now() - ts > CFG.cacheTTL };
+    } catch { return null; }
+  },
+  set(key, data) {
+    try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data })); }
+    catch { /* quota exceeded */ }
+  },
+  ageLabel(ts) {
+    const m = Math.floor((Date.now() - ts) / 60e3);
+    return m < 1 ? 'just now' : `${m}m ago`;
+  },
+};
 
-function loadCache() {
-  try {
-    const raw = localStorage.getItem(CACHE_KEY);
-    if (!raw) return null;
-    const { ts, posts } = JSON.parse(raw);
-    if (Date.now() - ts > CACHE_TTL_MS) return null; // expired
-    return { posts, ts };
-  } catch { return null; }
-}
-
-function cacheAge(ts) {
-  const mins = Math.floor((Date.now() - ts) / 60000);
-  return mins < 1 ? 'just now' : `${mins}m ago`;
-}
-
-// ── Proxy / fetch ─────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// NETWORK
+// ══════════════════════════════════════════════════════════════════════════════
 const PROXIES = [
-  url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-  url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+  u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
+  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+  u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
 ];
+let _lastProxy = 0;
 
-// Remember which proxy worked last time
-let lastWorkingProxy = 0;
-
-async function fetchWithFallback(redditUrl, externalSignal) {
-  // Try proxies starting from the last one that worked
-  const order = [...Array(PROXIES.length).keys()].map(i => (i + lastWorkingProxy) % PROXIES.length);
+async function fetchProxy(url, signal) {
+  const order = PROXIES.map((_, i) => (i + _lastProxy) % PROXIES.length);
   for (const idx of order) {
     try {
-      const ctrl = AbortSignal.any
-        ? AbortSignal.any([AbortSignal.timeout(8000), ...(externalSignal ? [externalSignal] : [])])
+      const ctrl = (typeof AbortSignal.any === 'function' && signal)
+        ? AbortSignal.any([AbortSignal.timeout(8000), signal])
         : AbortSignal.timeout(8000);
-      const res = await fetch(PROXIES[idx](redditUrl), { signal: ctrl });
+      const res = await fetch(PROXIES[idx](url), { signal: ctrl });
       if (!res.ok) continue;
       const text = await res.text();
-      let data;
-      try { const o = JSON.parse(text); data = o.contents ? JSON.parse(o.contents) : o; }
+      let parsed;
+      try { const o = JSON.parse(text); parsed = o.contents ? JSON.parse(o.contents) : o; }
       catch { continue; }
-      if (data?.data?.children) {
-        lastWorkingProxy = idx; // remember winner
-        return data.data.children.map(c => c.data);
-      }
-    } catch { /* try next */ }
+      if (parsed) { _lastProxy = idx; return parsed; }
+    } catch (e) { if (e?.name === 'AbortError') throw e; }
   }
-  // Direct fetch — works when opened locally
   try {
-    const res = await fetch(redditUrl, { headers: { 'User-Agent': 'FreeDrops/1.0' }, signal: AbortSignal.timeout(8000) });
-    if (res.ok) {
-      const data = await res.json();
-      if (data?.data?.children) return data.data.children.map(c => c.data);
-    }
+    const res = await fetch(url, { headers: { 'User-Agent': 'FreeDrops/1.0' }, signal: AbortSignal.timeout(8000) });
+    if (res.ok) return res.json();
   } catch { /* give up */ }
   return null;
 }
 
-// ── Filters ───────────────────────────────────────────────────────────────────
-function isFreeGame(post) {
-  if (post._trustAll) return true;
-  const text = (post.title + ' ' + (post.link_flair_text || '') + ' ' + (post.selftext || '')).toLowerCase();
-  if (!INCLUDE_KEYWORDS.some(kw => text.includes(kw))) return false;
-  if (EXCLUDE_EXCEPTIONS.some(kw => text.includes(kw))) return true;
-  return !EXCLUDE_KEYWORDS.some(kw => text.includes(kw));
-}
-
-function isExpired(post) {
-  const text = (post.title + ' ' + (post.link_flair_text || '')).toLowerCase();
-  return EXPIRED_MARKERS.some(m => text.includes(m));
-}
-
-function isRecent(post) {
-  return (Date.now() / 1000 - post.created_utc) / 3600 <= MAX_AGE_HOURS;
-}
-
-function detectPlatform(post) {
-  const title    = (post.title + ' ' + (post.link_flair_text || '')).toLowerCase();
-  const fullText = (title + ' ' + (post.url || '') + ' ' + (post.selftext || '')).toLowerCase();
-
-  // Pass 1 — title/flair only using bracket patterns (most reliable)
-  const BRACKET_PATTERNS = {
-    steam:   ['[steam]','(steam)'],
-    epic:    ['[epic]','(epic)','[egs]'],
-    gog:     ['[gog]','(gog)'],
-    itch:    ['[itch]','(itch)','itch.io'],
-    ubisoft: ['[ubisoft]','(ubisoft)'],
-    origin:  ['[origin]','[ea]','(ea)'],
-    humble:  ['[humble]','(humble)'],
-  };
-  for (const p of PLATFORMS) {
-    const brackets = BRACKET_PATTERNS[p.key] || [];
-    if (brackets.some(pat => title.includes(pat))) return p;
-  }
-
-  // Pass 2 — broader scan of full text including URL and selftext
-  // Epic checked first since "epic games" is very specific; Steam last since "steam" is broad
-  const BROAD_PATTERNS = [
-    { key:'epic',    patterns:['epic games','epicgames','epic game','epic mega','store.epicgames','epicgames.com','egs free'] },
-    { key:'gog',     patterns:['gog.com','gog '] },
-    { key:'itch',    patterns:[] }, // already caught by bracket pass
-    { key:'ubisoft', patterns:['ubisoft connect','uplay'] },
-    { key:'origin',  patterns:['origin.com','ea app'] },
-    { key:'humble',  patterns:['humble bundle','humblebundle'] },
-    { key:'steam',   patterns:['steampowered','steamgifts','steam '] },
-  ];
-  for (const { key, patterns } of BROAD_PATTERNS) {
-    if (patterns.some(pat => fullText.includes(pat))) {
-      return PLATFORMS.find(p => p.key === key) || null;
-    }
-  }
-
+// ══════════════════════════════════════════════════════════════════════════════
+// PLATFORM DETECTION
+// ══════════════════════════════════════════════════════════════════════════════
+function detectPlatform(title, flair = '', url = '', body = '') {
+  const titleText = (title + ' ' + flair).toLowerCase();
+  const fullText  = (titleText + ' ' + url + ' ' + body).toLowerCase();
+  for (const p of PLATFORMS) if (p.brackets.some(b => titleText.includes(b))) return p;
+  for (const p of PLATFORMS) if (p.broad.some(b => fullText.includes(b))) return p;
   return null;
 }
 
-// ── Thumbnail helper ──────────────────────────────────────────────────────────
-// ── Thumbnail: Reddit first, Steam CDN fallback ───────────────────────────────
-
-// Patterns that indicate a generic/promo image (not a real game screenshot)
-const BAD_THUMB_PATTERNS = [
-  'luna', 'amazon.com', 'redd.it/static', 'reddit.com/static',
-  'styles.redditmedia', 'a.thumbs.redditmedia', 'external-preview.redd'
-];
-
-function isBadThumb(url) {
-  if (!url) return true;
-  const u = url.toLowerCase();
-  return BAD_THUMB_PATTERNS.some(p => u.includes(p));
+function detectPlatformFromGP(platformsStr) {
+  if (!platformsStr) return null;
+  const s = platformsStr.toLowerCase();
+  if (s.includes('epic'))    return PLATFORMS.find(p => p.key === 'epic');
+  if (s.includes('gog'))     return PLATFORMS.find(p => p.key === 'gog');
+  if (s.includes('itch'))    return PLATFORMS.find(p => p.key === 'itch');
+  if (s.includes('ubisoft')) return PLATFORMS.find(p => p.key === 'ubisoft');
+  if (s.includes('origin') || s.includes(' ea')) return PLATFORMS.find(p => p.key === 'origin');
+  if (s.includes('steam'))   return PLATFORMS.find(p => p.key === 'steam');
+  return null;
 }
 
-// Parse the game name from FreeGameFindings-style titles:
-// "[Steam] (Game) Car Mechanic Simulator 2018" → "Car Mechanic Simulator 2018"
 function parseGameName(title) {
-  // Remove leading bracket groups like [Steam], (Game), [PSA], [DLC] etc.
-  return title
-    .replace(/^(\[[^\]]*\]\s*|\([^)]*\)\s*)+/i, '')
-    .replace(/^(\[[^\]]*\]\s*|\([^)]*\)\s*)+/i, '') // second pass for double brackets
-    .trim();
+  return title.replace(/^(\[[^\]]*\]\s*|\([^)]*\)\s*)+/i, '').replace(/^(\[[^\]]*\]\s*|\([^)]*\)\s*)+/i, '').trim();
 }
 
-// Steam image cache to avoid re-fetching
-const _steamImgCache = {};
+// ══════════════════════════════════════════════════════════════════════════════
+// IMAGE RESOLUTION
+// ══════════════════════════════════════════════════════════════════════════════
+const _gpImageMap = {};
+const _steamCache = {};
 
-async function fetchSteamImage(gameName) {
-  if (_steamImgCache[gameName] !== undefined) return _steamImgCache[gameName];
-  try {
-    const q = encodeURIComponent(gameName);
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://store.steampowered.com/api/storesearch/?term=${q}&cc=US&l=en`)}`;
-    const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(5000) });
-    if (!res.ok) throw new Error('proxy fail');
-    const outer = await res.json();
-    const data = JSON.parse(outer.contents);
-    const item = data?.items?.[0];
-    if (!item) { _steamImgCache[gameName] = null; return null; }
-    const url = `https://cdn.akamai.steamstatic.com/steam/apps/${item.id}/header.jpg`;
-    _steamImgCache[gameName] = url;
-    return url;
-  } catch {
-    _steamImgCache[gameName] = null;
-    return null;
+function buildGPImageMap(games) {
+  for (const g of games) {
+    const img = g.thumbnail || g.image || g.thumb;
+    if (!img) continue;
+    const full   = g.title.toLowerCase().trim();
+    const parsed = full.replace(/\(.*?\)/g, '').replace(/giveaway|free/gi, '').trim();
+    _gpImageMap[full]   = img;
+    _gpImageMap[parsed] = img;
   }
 }
 
-function getThumbnail(post) {
-  return null; // always use Steam CDN lookup via fillMissingThumbs
+function findGPImage(gameName) {
+  const name = gameName.toLowerCase().trim();
+  if (_gpImageMap[name]) return _gpImageMap[name];
+  for (const [k, u] of Object.entries(_gpImageMap))
+    if (k.length > 4 && (name.includes(k) || k.includes(name))) return u;
+  return null;
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+async function fetchSteamImage(gameName) {
+  if (_steamCache[gameName] !== undefined) return _steamCache[gameName];
+  try {
+    const data = await fetchProxy(`https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(gameName)}&cc=US&l=en`);
+    const item = data?.items?.[0];
+    const url  = item ? `https://cdn.akamai.steamstatic.com/steam/apps/${item.id}/header.jpg` : null;
+    _steamCache[gameName] = url;
+    return url;
+  } catch { _steamCache[gameName] = null; return null; }
+}
+
+async function fillMissingThumbs() {
+  for (const el of document.querySelectorAll('.card-thumb-placeholder[data-game]')) {
+    const name = el.getAttribute('data-game');
+    if (!name) continue;
+    const url = findGPImage(name) || await fetchSteamImage(name);
+    if (!url) continue;
+    const img = Object.assign(document.createElement('img'), { className: 'card-thumb', src: url, alt: '', loading: 'lazy' });
+    img.onerror = () => img.outerHTML = '<div class="card-thumb-placeholder">🎮</div>';
+    el.replaceWith(img);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// NORMALISE → unified game model
+// ══════════════════════════════════════════════════════════════════════════════
+function normaliseRedditPost(p) {
+  const storeUrl = p.url && !p.url.includes('reddit.com') ? p.url : null;
+  const expired  = CFG.expiredMarkers.some(m => (p.title + ' ' + (p.link_flair_text||'')).toLowerCase().includes(m));
+  return {
+    id: p.id, title: p.title,
+    platform: detectPlatform(p.title, p.link_flair_text||'', p.url||'', p.selftext||''),
+    thumb: null, gameName: parseGameName(p.title),
+    url: storeUrl || `https://reddit.com${p.permalink}`,
+    altUrl: storeUrl ? `https://reddit.com${p.permalink}` : null,
+    score: p.score, timeLabel: timeAgo(p.created_utc), worth: null,
+    source: 'reddit', expired, rawAge: (Date.now()/1000 - p.created_utc)/3600, _sub: p._sub,
+  };
+}
+
+function normaliseGPGame(g) {
+  const endLabel = g.end_date && g.end_date !== 'N/A' ? `ends ${g.end_date.split(' ')[0]}` : '';
+  return {
+    id: String(g.id), title: g.title,
+    platform: detectPlatformFromGP(g.platforms),
+    thumb: g.thumbnail || g.image || null, gameName: g.title,
+    url: g.open_giveaway_url, altUrl: null, score: null,
+    timeLabel: endLabel,
+    worth: (g.worth && g.worth !== 'N/A' && g.worth !== '$0.00') ? g.worth : null,
+    source: 'gamerpower', expired: false, rawAge: 0, _sub: null,
+  };
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// UNIFIED CARD RENDERER
+// ══════════════════════════════════════════════════════════════════════════════
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function timeAgo(utc) {
-  const d = (Date.now() / 1000) - utc;
-  if (d < 3600)  return Math.floor(d / 60) + 'm ago';
-  if (d < 86400) return Math.floor(d / 3600) + 'h ago';
-  return Math.floor(d / 86400) + 'd ago';
+  const d = Date.now()/1000 - utc;
+  if (d < 3600) return `${Math.floor(d/60)}m ago`;
+  if (d < 86400) return `${Math.floor(d/3600)}h ago`;
+  return `${Math.floor(d/86400)}d ago`;
 }
 
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function renderCard(game, idx) {
+  const thumbHtml = game.thumb
+    ? `<img class="card-thumb" src="${esc(game.thumb)}" alt="" loading="lazy" onerror="this.outerHTML='<div class=\\'card-thumb-placeholder\\'>🎮</div>'">`
+    : `<div class="card-thumb-placeholder" data-game="${esc(game.gameName)}">🎮</div>`;
+
+  const platTag   = game.platform ? `<span class="tag ${game.platform.cls}">${esc(game.platform.label)}</span>` : '';
+  
+  let sourceTag = '';
+  if (game.source === 'gamerpower') sourceTag = `<span class="tag tag-gp">GamerPower</span>`;
+  else if (game.source === 'reddit') sourceTag = `<span class="tag tag-sub">r/${esc(game._sub)}</span>`;
+  else if (game.source === 'backlog_search') sourceTag = `<span class="tag tag-steam">Steam Store</span>`;
+
+  const ageTag  = game.source==='reddit' && !game.expired && game.rawAge < 6  ? `<span class="tag tag-new">New</span>`
+                : game.source==='reddit' && !game.expired && game.score > 300 ? `<span class="tag tag-hot">🔥 Hot</span>` : '';
+  const expTag  = game.expired ? `<span class="tag tag-expired">⏰ Expired</span>` : '';
+  const timeEl  = game.timeLabel ? `<span class="card-time">${esc(game.timeLabel)}</span>` : '';
+  
+  const metaLeft = game.score !== null
+    ? `<span class="card-meta-left"><svg width="11" height="11" viewBox="0 0 24 24" fill="#ff4d00"><path d="M12 4l8 8H4z"/></svg>${game.score.toLocaleString()}</span>`
+    : game.worth ? `<span class="card-meta-left" style="color:var(--muted)">${game.worth==='Free'?'':'was '}<strong style="color:var(--accent2)">${esc(game.worth)}</strong></span>` : '';
+
+  let buttons;
+  if (game.expired) {
+    buttons = `<span class="btn btn-disabled">Ended</span>`;
+  } else if (game.altUrl) {
+    buttons = `<a class="btn btn-ghost" href="${esc(game.altUrl)}" target="_blank" rel="noopener">Reddit</a>
+               <a class="btn btn-primary" href="${esc(game.url)}" target="_blank" rel="noopener">Open Store →</a>`;
+  } else {
+    buttons = `<a class="btn btn-primary" href="${esc(game.url)}" target="_blank" rel="noopener">${game.source==='gamerpower' ? 'Claim Free →' : 'View →'}</a>`;
+  }
+
+  // Phase 3: Add Save/Remove button based on local storage state
+  const isSaved = Backlog.isSaved(game.id);
+  const saveBtnCls = isSaved ? 'btn-ghost saved' : 'btn-ghost';
+  const saveBtnText = App._source === 'backlog' && !Backlog._searchResults 
+                      ? '− Remove' 
+                      : (isSaved ? '✓ Saved' : '+ Save');
+
+  const saveBtn = `<button class="btn ${saveBtnCls}" onclick="Backlog.toggleSave('${esc(game.id)}')" title="Save to Personal Backlog">${saveBtnText}</button>`;
+  buttons = saveBtn + buttons;
+
+  return `
+    <div class="card${game.expired ? ' expired' : ''}" style="animation-delay:${idx * 0.04}s">
+      ${thumbHtml}
+      <div class="card-body">
+        <div class="card-title">${esc(game.title)}</div>
+        <div class="card-meta">${sourceTag}${platTag}${ageTag}${expTag}${timeEl}</div>
+        <div class="card-footer">${metaLeft}<div class="btn-group">${buttons}</div></div>
+      </div>
+    </div>`;
 }
 
-// ── Render ────────────────────────────────────────────────────────────────────
-function renderSkeletons() {
-  const s = Array.from({length: 6}).map(() => `
+// ══════════════════════════════════════════════════════════════════════════════
+// CONTROLS BAR
+// ══════════════════════════════════════════════════════════════════════════════
+const NAV_SECTIONS = [
+  { key:'all',     label:'All'     },
+  { key:'steam',   label:'Steam'   },
+  { key:'epic',    label:'Epic'    },
+  { key:'itch',    label:'Itch.io' },
+  { key:'gog',     label:'GOG'     },
+  { key:'others',  label:'Others'  },
+  { key:'expired', label:'Expired' },
+];
+
+function filterBySection(games, key) {
+  if (key === 'all')     return games.filter(g => !g.expired);
+  if (key === 'expired') return games.filter(g =>  g.expired);
+  if (key === 'others')  return games.filter(g => !g.expired && !MAIN_PLATFORM_KEYS.includes(g.platform?.key));
+  return games.filter(g => !g.expired && g.platform?.key === key);
+}
+
+function applyFilters(games, section, source) {
+  let result = filterBySection(games, section);
+  if (section !== 'expired') result = result.filter(g => !Filters.isDLC(g));
+  return Filters.applySort(result, source);
+}
+
+function renderControlsBar(games, activeSection, onSectionFn, source) {
+  const tabs = NAV_SECTIONS
+    .filter(s => s.key !== 'expired' || games.some(g => g.expired))
+    .map(s => {
+      const cnt = filterBySection(games, s.key).filter(g => s.key === 'expired' || !Filters.isDLC(g)).length;
+      if (cnt === 0 && s.key !== 'all') return '';
+      const icon = PLATFORM_ICONS[s.key] ? `<img src="${PLATFORM_ICONS[s.key]}" class="pnav-icon" alt="" onerror="this.style.display='none'">` : '';
+      return `<button class="pnav-btn${activeSection === s.key ? ' active' : ''}" onclick="${onSectionFn}('${s.key}')">
+        ${icon}${s.label}<span class="pnav-count">${cnt}</span>
+      </button>`;
+    }).join('');
+
+  const sortOpts = source === 'reddit'
+    ? `<option value="newest" ${Filters.sortMode==='newest'?'selected':''}>Newest</option>
+       <option value="top"    ${Filters.sortMode==='top'   ?'selected':''}>Top Voted</option>`
+    : `<option value="newest" ${Filters.sortMode==='newest'?'selected':''}>Newest</option>
+       <option value="value"  ${Filters.sortMode==='value' ?'selected':''}>Highest Value</option>`;
+
+  return `
+    <div class="controls-bar">
+      <div class="platform-nav">${tabs}</div>
+      <label class="toggle-wrap" title="Hide DLC, Beta, Alpha and Pack entries">
+        <input type="checkbox" onchange="Filters.hideDLC=this.checked; Filters.onChange()" ${Filters.hideDLC ? 'checked' : ''}>
+        <span class="toggle-track"></span> Hide DLCs
+      </label>
+      <select class="sort-select" onchange="Filters.sortMode=this.value; Filters.onChange()" title="Sort order">
+        ${sortOpts}
+      </select>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════════════════════════════════════════════
+function setHeader(count, cacheTs, fromCache) {
+  const badge = document.getElementById('liveCount');
+  const note  = document.getElementById('cacheNote');
+  if (count !== null) {
+    badge.textContent = `${count} LIVE`;
+    badge.style.display = count > 0 ? 'inline-block' : 'none';
+  } else {
+    badge.style.display = 'none';
+  }
+  note.textContent = fromCache && cacheTs ? `cached ${Cache.ageLabel(cacheTs)}` : '';
+  note.style.display = fromCache && cacheTs ? 'inline' : 'none';
+}
+
+function setValueBadge(games, source) {
+  const el = document.getElementById('valueBadge');
+  if (source !== 'gamerpower') { el.style.display = 'none'; return; }
+  const total = games.filter(g => !g.expired && g.worth).reduce((sum, g) => sum + (parseFloat(g.worth.replace(/[^0-9.]/g,'')) || 0), 0);
+  if (total <= 0) { el.style.display = 'none'; return; }
+  el.textContent = `🔥 $${total.toFixed(0)}+ Value Live`;
+  el.style.display = 'inline-block';
+}
+
+function setCount(html) {
+  const el = document.getElementById('countInfo');
+  el.innerHTML = html; el.style.display = html ? 'block' : 'none';
+}
+
+function showSkeletons() {
+  const s = Array.from({length:6}).map(() => `
     <div class="skeleton-card">
       <div class="skel skel-img"></div>
       <div class="skel-body">
-        <div class="skel skel-line" style="width:88%"></div>
-        <div class="skel skel-line" style="width:60%"></div>
-        <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
-          <div class="skel skel-tag"></div>
-          <div class="skel skel-btn"></div>
+        <div class="skel skel-line" style="width:85%"></div>
+        <div class="skel skel-line" style="width:55%"></div>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:2px">
+          <div class="skel skel-tag"></div><div class="skel skel-btn"></div>
         </div>
       </div>
     </div>`).join('');
   document.getElementById('content').innerHTML = `<div class="skeleton-grid">${s}</div>`;
 }
 
-function renderError(detail) {
-  document.getElementById('liveCount').style.display = 'none';
-  document.getElementById('countInfo').style.display = 'none';
-  document.getElementById('cacheNote').style.display = 'none';
+function showError(msg) {
+  setHeader(0, null, false); setCount('');
+  document.getElementById('valueBadge').style.display = 'none';
   document.getElementById('content').innerHTML = `
     <div class="state-box">
       <div class="icon">⚠️</div>
-      <p><strong>Couldn't load giveaways</strong><br><br>${detail}</p>
-      <button class="error-btn" onclick="_currentSource==='gamerpower' ? loadGamerPower(true) : loadGiveaways(true)">Try Again</button>
+      <p><strong>Couldn't load giveaways</strong><br>${msg}</p>
+      <button class="btn-retry" onclick="App.refresh()">Try Again</button>
     </div>`;
 }
 
-function buildCard(p, i, isExp) {
-  const ageHours = (Date.now() / 1000 - p.created_utc) / 3600;
-  const platform = detectPlatform(p);
-  const thumb    = getThumbnail(p);
-  const cardId   = `card-${p.id}`;
+// Global lookup for Save functionality
+function getGameById(id) {
+  return Reddit._games.find(g => g.id === id) || 
+         GamerPower._games.find(g => g.id === id) || 
+         (Backlog._searchResults && Backlog._searchResults.find(g => g.id === id)) ||
+         Backlog._games.find(g => g.id === id);
+}
 
-  const ageTag     = !isExp && ageHours < 6 ? `<span class="tag tag-new">New</span>`
-                   : !isExp && p.score > 300 ? `<span class="tag tag-hot">🔥 Hot</span>` : '';
-  const expiredTag = isExp ? `<span class="tag tag-expired">⏰ Expired</span>` : '';
-  const platTag    = platform ? `<span class="tag ${platform.cls}">${platform.label}</span>` : '';
+// ══════════════════════════════════════════════════════════════════════════════
+// BACKLOG (PHASE 3)
+// ══════════════════════════════════════════════════════════════════════════════
+const Backlog = {
+  _games: [],
+  _searchResults: null,
 
-  // If no Reddit thumb, show placeholder and async-load from Steam CDN
-  let thumbHtml;
-  if (thumb) {
-    thumbHtml = `<img class="card-thumb" src="${escHtml(thumb)}" alt="" loading="lazy"
-      onerror="loadSteamThumb(this, '${escHtml(parseGameName(p.title))}')">`;
-  } else {
-    const gameName = escHtml(parseGameName(p.title));
-    thumbHtml = `<div class="card-thumb-placeholder" id="thumb-${escHtml(p.id)}" data-game="${gameName}">🎮</div>`;
-  }
+  loadStorage() {
+    try { this._games = JSON.parse(localStorage.getItem('fd_backlog')) || []; }
+    catch { this._games = []; }
+  },
 
-  const storeUrl = p.url && !p.url.includes('reddit.com') ? p.url : null;
-  let buttons = '';
-  if (isExp) {
-    buttons = `<span class="claim-btn disabled-btn">Ended</span>`;
-  } else if (storeUrl) {
-    buttons = `
-      <a class="claim-btn secondary" href="https://reddit.com${escHtml(p.permalink)}" target="_blank" rel="noopener">Reddit</a>
-      <a class="claim-btn" href="${escHtml(storeUrl)}" target="_blank" rel="noopener">Open Store →</a>`;
-  } else {
-    buttons = `<a class="claim-btn" href="https://reddit.com${escHtml(p.permalink)}" target="_blank" rel="noopener">View Giveaway →</a>`;
-  }
+  async load(force = false) {
+    this.loadStorage();
+    if (this._searchResults && force) {
+      // Refresh re-runs current search if active
+      await this.search(document.getElementById('steamSearch').value);
+    } else {
+      this.render();
+    }
+  },
 
-  return `
-    <div class="card${isExp ? ' expired' : ''}" style="animation-delay:${i * 0.04}s">
-      ${thumbHtml}
-      <div class="card-body">
-        <div class="card-title">${escHtml(p.title)}</div>
-        <div class="card-meta">
-          <span class="tag tag-sub">r/${escHtml(p._sub)}</span>
-          ${platTag}${ageTag}${expiredTag}
-          <span class="card-time">${timeAgo(p.created_utc)}</span>
-        </div>
-        <div class="card-footer">
-          <span class="upvotes">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="#ff4d00"><path d="M12 4l8 8H4z"/></svg>
-            ${p.score.toLocaleString()}
-          </span>
-          <div class="btn-group">${buttons}</div>
-        </div>
+  render() {
+    setHeader(null, null, false);
+    setValueBadge([], 'backlog');
+    
+    setCount(`
+      <div style="display:flex; gap:8px; margin-bottom: 16px;">
+        <input type="text" id="steamSearch" class="search-input" placeholder="Search Steam database to add to vault..." onkeydown="if(event.key==='Enter') Backlog.search(this.value)">
+        <button class="btn btn-primary" onclick="Backlog.search(document.getElementById('steamSearch').value)">Search</button>
       </div>
-    </div>`;
-}
+      ${this._searchResults 
+        ? `<em>Showing Steam results. <a href="#" onclick="Backlog.clearSearch(); return false;" style="color:var(--accent2)">Back to Vault</a></em>` 
+        : `<strong>${this._games.length}</strong> games saved in your vault`}
+    `);
+    this._paint();
+  },
 
-// ── Platform sections ─────────────────────────────────────────────────────────
-// Sections shown as tabs; "all" is the default view
-// Using DuckDuckGo's favicon proxy — works for all domains including itch.io
-function faviconUrl(domain) {
-  return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
-}
+  _paint() {
+    const gamesToShow = this._searchResults || this._games;
+    const cards = gamesToShow.length
+      ? `<div class="grid">${gamesToShow.map((g, i) => renderCard(g, i)).join('')}</div>`
+      : `<div class="state-box" style="padding:40px 0"><div class="icon">${this._searchResults ? '🔍' : '🗄️'}</div><p>${this._searchResults ? 'No games found on Steam for that search.' : 'Your vault is empty.<br>Search above or save games directly from the feeds!'}</p></div>`;
+    
+    document.getElementById('content').innerHTML = cards;
+    if (this._searchResults) setTimeout(fillMissingThumbs, 0);
+  },
 
-const SECTION_ICONS = {
-  all:     null,
-  steam:   faviconUrl('store.steampowered.com'),
-  epic:    faviconUrl('epicgames.com'),
-  itch:    faviconUrl('itch.io'),
-  gog:     faviconUrl('gog.com'),
-  others:  null,
-  expired: null,
-};
-
-const SECTIONS = [
-  { key: 'all',    label: 'All',      platformKeys: null },
-  { key: 'steam',  label: 'Steam',    platformKeys: ['steam'] },
-  { key: 'epic',   label: 'Epic',     platformKeys: ['epic'] },
-  { key: 'itch',   label: 'Itch.io',  platformKeys: ['itch'] },
-  { key: 'gog',    label: 'GOG',      platformKeys: ['gog'] },
-  { key: 'others', label: 'Others',   platformKeys: '__others__' },
-  { key: 'expired',label: 'Expired',  platformKeys: '__expired__' },
-];
-
-const MAIN_PLATFORM_KEYS = ['steam','epic','itch','gog'];
-let currentSection = 'all';
-let _allActive = [], _allExpired = [];
-
-function getPlatformKey(post) {
-  const p = detectPlatform(post);
-  return p ? p.key : null;
-}
-
-function getPostsForSection(key, active, expired) {
-  if (key === 'expired') return expired;
-  if (key === 'all')     return active;
-  if (key === 'others')  return active.filter(p => !MAIN_PLATFORM_KEYS.includes(getPlatformKey(p)));
-  // named platform
-  const sec = SECTIONS.find(s => s.key === key);
-  if (!sec || !sec.platformKeys) return active;
-  return active.filter(p => sec.platformKeys.includes(getPlatformKey(p)));
-}
-
-function countForSection(key, active, expired) {
-  return getPostsForSection(key, active, expired).length;
-}
-
-function renderNav(active, expired) {
-  const btns = SECTIONS.map(s => {
-    const cnt = countForSection(s.key, active, expired);
-    if (cnt === 0 && s.key !== 'all') return '';
-    const iconUrl = SECTION_ICONS[s.key];
-    const iconHtml = iconUrl
-      ? `<img src="${iconUrl}" class="pnav-icon" alt="" onerror="this.style.display='none'">`
-      : '';
-    return `<button class="pnav-btn${currentSection === s.key ? ' active' : ''}"
-      onclick="switchSection('${s.key}')">${iconHtml}${s.label}<span class="pnav-count">${cnt}</span></button>`;
-  }).join('');
-  return `<div class="platform-nav">${btns}</div>`;
-}
-
-function switchSection(key) {
-  currentSection = key;
-  renderContent(_allActive, _allExpired, null, null, false);
-}
-
-function renderCards(active, expired, fromCache, cacheTs) {
-  _allActive  = active;
-  _allExpired = expired;
-
-  const total = active.length + expired.length;
-
-  const cacheNote = document.getElementById('cacheNote');
-  if (fromCache && cacheTs) {
-    cacheNote.textContent = `cached ${cacheAge(cacheTs)}`;
-    cacheNote.style.display = 'inline';
-  } else {
-    cacheNote.style.display = 'none';
-  }
-
-  if (!total) {
-    document.getElementById('liveCount').style.display = 'none';
-    document.getElementById('countInfo').style.display = 'none';
-    document.getElementById('content').innerHTML = `
-      <div class="state-box">
-        <div class="icon">🎮</div>
-        <p><strong>No active giveaways found right now</strong><br>Check back soon — new ones drop regularly!</p>
-      </div>`;
-    return;
-  }
-
-  document.getElementById('liveCount').textContent = active.length + ' live';
-  document.getElementById('liveCount').style.display = 'inline-block';
-  document.getElementById('countInfo').innerHTML =
-    `<span>${active.length}</span> active · <span style="color:var(--muted)">${expired.length} expired</span> · across ${SUBREDDITS.length} subreddits`;
-  document.getElementById('countInfo').style.display = 'block';
-
-  renderContent(active, expired, fromCache, cacheTs, true);
-}
-
-function renderContent(active, expired, fromCache, cacheTs, resetTab) {
-  if (resetTab) currentSection = 'all';
-  const posts = getPostsForSection(currentSection, active, expired);
-  const isExp = currentSection === 'expired';
-
-  const nav = renderNav(active, expired);
-
-  let cardsHtml = '';
-  if (!posts.length) {
-    cardsHtml = `<div class="state-box" style="padding:40px 0">
-      <div class="icon">🔍</div>
-      <p>No ${currentSection === 'expired' ? 'expired' : 'active'} giveaways in this category right now.</p>
-    </div>`;
-  } else {
-    cardsHtml = `<div class="grid">${posts.map((p, i) => buildCard(p, i, isExp)).join('')}</div>`;
-  }
-
-  document.getElementById('content').innerHTML = nav + cardsHtml;
-  // Async-fill any cards that had no Reddit thumbnail
-  setTimeout(fillMissingThumbs, 0);
-}
-
-// ── Load ──────────────────────────────────────────────────────────────────────
-// ── GamerPower API ────────────────────────────────────────────────────────────
-let _currentSource = 'gamerpower'; // 'reddit' | 'gamerpower'
-const GP_CACHE_KEY = 'freedrops_gp_cache_v1';
-const GP_CACHE_TTL = 15 * 60 * 1000;
-
-function switchSource(src) {
-  _currentSource = src;
-  document.getElementById('srcReddit').classList.toggle('active', src === 'reddit');
-  document.getElementById('srcGamerpower').classList.toggle('active', src === 'gamerpower');
-  if (src === 'gamerpower') {
-    loadGamerPower(false);
-  } else {
-    loadGiveaways(false);
-  }
-}
-
-const GP_PLATFORM_MAP = {
-  'steam':            { key:'steam',   label:'🎮 Steam',    cls:'tag-steam'   },
-  'epic-games-store': { key:'epic',    label:'⚡ Epic',     cls:'tag-epic'    },
-  'gog':              { key:'gog',     label:'🌌 GOG',      cls:'tag-gog'     },
-  'itchio':           { key:'itch',    label:'🎲 Itch.io',  cls:'tag-itch'    },
-  'ubisoft':          { key:'ubisoft', label:'🔷 Ubisoft',  cls:'tag-ubisoft' },
-  'origin':           { key:'origin',  label:'🔶 EA/Origin',cls:'tag-origin'  },
-};
-
-function gpPlatformTag(platforms) {
-  if (!platforms) return '';
-  const key = platforms.toLowerCase().split(',')[0].trim();
-  const p = GP_PLATFORM_MAP[key];
-  return p ? `<span class="tag ${p.cls}">${p.label}</span>` : `<span class="tag tag-sub">${escHtml(platforms)}</span>`;
-}
-
-function buildGPCard(g, i) {
-  const thumb = g.thumbnail || g.image || null;
-  const thumbHtml = thumb
-    ? `<img class="card-thumb" src="${escHtml(thumb)}" alt="" loading="lazy" onerror="this.outerHTML='<div class=\'card-thumb-placeholder\'>🎮</div>'">`
-    : `<div class="card-thumb-placeholder">🎮</div>`;
-
-  const worth = g.worth && g.worth !== 'N/A' && g.worth !== '$0.00'
-    ? `<span class="gp-worth">was <span>${escHtml(g.worth)}</span></span>` : '';
-
-  const endDate = g.end_date && g.end_date !== 'N/A'
-    ? `<span class="card-time">ends ${escHtml(g.end_date.split(' ')[0])}</span>` : '';
-
-  return `
-    <div class="card" style="animation-delay:${i * 0.04}s">
-      ${thumbHtml}
-      <div class="card-body">
-        <div class="card-title">${escHtml(g.title)}</div>
-        <div class="card-meta">
-          <span class="gp-source-badge">GamerPower</span>
-          ${gpPlatformTag(g.platforms)}
-          ${endDate}
-        </div>
-        <div class="card-footer">
-          ${worth}
-          <div class="btn-group">
-            <a class="claim-btn" href="${escHtml(g.open_giveaway_url)}" target="_blank" rel="noopener">Claim Free →</a>
-          </div>
-        </div>
-      </div>
-    </div>`;
-}
-
-function buildGPImageMap(games) {
-  for (const g of games) {
-    if (!g.thumbnail && !g.image) continue;
-    const img = g.thumbnail || g.image;
-    // Index by full title and by parsed name (stripped of store suffix like "(Steam) Giveaway")
-    const full = g.title.toLowerCase().trim();
-    const parsed = full
-      .replace(/\(.*?\)/g, '')   // remove parentheses
-      .replace(/giveaway|free/gi, '')
-      .trim();
-    _gpImageMap[full]   = img;
-    _gpImageMap[parsed] = img;
-  }
-}
-
-function findGPImage(postTitle) {
-  const name = parseGameName(postTitle).toLowerCase().trim();
-  // Try exact match first
-  if (_gpImageMap[name]) return _gpImageMap[name];
-  // Try partial match — check if any GP key is contained in the post name or vice versa
-  for (const [key, url] of Object.entries(_gpImageMap)) {
-    if (key.length > 4 && (name.includes(key) || key.includes(name))) return url;
-  }
-  return null;
-}
-
-async function loadGamerPower(forceRefresh = false) {
-  const btn = document.getElementById('refreshBtn');
-  btn.classList.add('spinning');
-  btn.disabled = true;
-
-  // Try cache
-  if (!forceRefresh) {
+  async search(query) {
+    if (!query || !query.trim()) return;
+    showSkeletons();
     try {
-      const raw = localStorage.getItem(GP_CACHE_KEY);
-      if (raw) {
-        const { ts, games } = JSON.parse(raw);
-        if (Date.now() - ts < GP_CACHE_TTL) {
-          buildGPImageMap(games);
-          renderGPCards(games, true, ts);
-          btn.classList.remove('spinning');
-          btn.disabled = false;
+      const data = await fetchProxy(`https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(query.trim())}&cc=US&l=en`);
+      if (!data?.items || data.items.length === 0) {
+        this._searchResults = [];
+      } else {
+        this._searchResults = data.items.map(item => ({
+          id: `steam-${item.id}`,
+          title: item.name,
+          platform: PLATFORMS.find(p => p.key === 'steam'),
+          thumb: `https://cdn.akamai.steamstatic.com/steam/apps/${item.id}/header.jpg`,
+          gameName: item.name,
+          url: `https://store.steampowered.com/app/${item.id}`,
+          altUrl: null, score: null, timeLabel: '',
+          worth: item.price ? `$${(item.price/100).toFixed(2)}` : 'Free',
+          source: 'backlog_search', expired: false, rawAge: 0, _sub: null
+        }));
+      }
+      this.render();
+    } catch (e) {
+      showError("Steam search failed: " + e.message);
+    }
+  },
+
+  clearSearch() {
+    this._searchResults = null;
+    this.render();
+  },
+
+  isSaved(id) {
+    return this._games.some(g => g.id === id);
+  },
+
+  toggleSave(id) {
+    this.loadStorage();
+    const idx = this._games.findIndex(g => g.id === id);
+    if (idx >= 0) {
+      this._games.splice(idx, 1);
+    } else {
+      const game = getGameById(id);
+      if (game) this._games.unshift(game); // Add to top of list
+    }
+    
+    try { localStorage.setItem('fd_backlog', JSON.stringify(this._games)); } catch {}
+    
+    // Repaint to update button UI across the site
+    App._currentSource()._paint();
+    // Update the counter text if we're actively looking at the vault list
+    if (App._source === 'backlog' && !this._searchResults) this.render();
+  }
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// REDDIT SOURCE
+// ══════════════════════════════════════════════════════════════════════════════
+const Reddit = {
+  _controller: null,
+  _games: [],
+  _section: 'all',
+
+  async load(force = false) {
+    if (this._controller) this._controller.abort();
+    this._controller = new AbortController();
+    if (!force) {
+      const cached = Cache.get(CFG.cacheKeyReddit);
+      if (cached && !cached.stale) { this._games = cached.data; this.render(true, cached.ts); return; }
+    }
+    showSkeletons();
+    try {
+      const results = await Promise.allSettled(
+        CFG.subreddits.map(async ({ name, endpoint, trustAll }) => {
+          const data = await fetchProxy(`https://www.reddit.com/r/${name}/${endpoint}.json?limit=100&raw_json=1`, this._controller.signal);
+          if (!data?.data?.children) return [];
+          return data.data.children
+            .map(c => ({ ...c.data, _sub: name, _trustAll: trustAll }))
+            .filter(p => !p.stickied && Reddit._isRecent(p) && (trustAll || Reddit._isFree(p)));
+        })
+      );
+      const seen = new Set();
+      const all  = results.flatMap(r => r.status === 'fulfilled' ? r.value : [])
+        .filter(p => { if (seen.has(p.id)) return false; seen.add(p.id); return true; })
+        .sort((a, b) => b.created_utc - a.created_utc)
+        .map(normaliseRedditPost);
+
+      if (!all.length) {
+        const stale = Cache.get(CFG.cacheKeyReddit);
+        if (stale) { this._games = stale.data; this.render(true, stale.ts); return; }
+        showError('All requests failed. Check your internet connection.'); return;
+      }
+      Cache.set(CFG.cacheKeyReddit, all);
+      this._games = all;
+      this.render(false, null);
+    } catch (e) { if (e?.name !== 'AbortError') showError(e.message); }
+  },
+
+  render(fromCache, cacheTs) {
+    const active = this._games.filter(g => !g.expired);
+    setHeader(active.length, cacheTs, fromCache);
+    setValueBadge([], 'reddit');
+    setCount(`<strong>${active.length}</strong> active · <span style="color:var(--muted)">${this._games.length - active.length} expired</span> · across ${CFG.subreddits.length} subreddits`);
+    this._section = 'all';
+    this._paint();
+  },
+
+  switchSection(key) { this._section = key; this._paint(); },
+
+  _paint() {
+    const filtered = applyFilters(this._games, this._section, 'reddit');
+    const controls = renderControlsBar(this._games, this._section, 'Reddit.switchSection', 'reddit');
+    const cards = filtered.length
+      ? `<div class="grid">${filtered.map((g, i) => renderCard(g, i)).join('')}</div>`
+      : `<div class="state-box" style="padding:40px 0"><div class="icon">🔍</div><p>Nothing in this category right now.</p></div>`;
+    document.getElementById('content').innerHTML = controls + cards;
+    setTimeout(fillMissingThumbs, 0);
+  },
+
+  _isRecent: p => (Date.now()/1000 - p.created_utc) / 3600 <= CFG.maxAgeHours,
+  _isFree(p) {
+    const text = (p.title + ' ' + (p.link_flair_text||'') + ' ' + (p.selftext||'')).toLowerCase();
+    if (!CFG.includeKw.some(k => text.includes(k))) return false;
+    if (CFG.excludeExcept.some(k => text.includes(k))) return true;
+    return !CFG.excludeKw.some(k => text.includes(k));
+  },
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// GAMERPOWER SOURCE
+// ══════════════════════════════════════════════════════════════════════════════
+const GamerPower = {
+  _games: [],
+  _section: 'all',
+
+  async load(force = false) {
+    if (!force) {
+      const cached = Cache.get(CFG.cacheKeyGP);
+      if (cached && !cached.stale) {
+        this._games = cached.data;
+        buildGPImageMap(cached.data);
+        this.render(true, cached.ts); return;
+      }
+    }
+    showSkeletons();
+    try {
+      const data = await fetchProxy('https://www.gamerpower.com/api/giveaways?type=game&platform=pc');
+      if (!Array.isArray(data) || !data.length) throw new Error('No games returned from GamerPower.');
+      buildGPImageMap(data);
+      const games = data.map(normaliseGPGame);
+      Cache.set(CFG.cacheKeyGP, games);
+      this._games = games;
+      this.render(false, null);
+    } catch (e) {
+      const stale = Cache.get(CFG.cacheKeyGP);
+      if (stale) { this._games = stale.data; this.render(true, stale.ts); return; }
+      showError(e.message);
+    }
+  },
+
+  render(fromCache, cacheTs) {
+    setHeader(this._games.length, cacheTs, fromCache);
+    setValueBadge(this._games, 'gamerpower');
+    setCount(`<strong>${this._games.length}</strong> active giveaways from GamerPower`);
+    this._section = 'all';
+    this._paint();
+  },
+
+  switchSection(key) { this._section = key; this._paint(); },
+
+  _paint() {
+    const filtered = applyFilters(this._games, this._section, 'gamerpower');
+    const controls = renderControlsBar(this._games, this._section, 'GamerPower.switchSection', 'gamerpower');
+    const cards = filtered.length
+      ? `<div class="grid">${filtered.map((g, i) => renderCard(g, i)).join('')}</div>`
+      : `<div class="state-box" style="padding:40px 0"><div class="icon">🔍</div><p>Nothing in this category right now.</p></div>`;
+    document.getElementById('content').innerHTML = controls + cards;
+  },
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// APP CONTROLLER
+// ══════════════════════════════════════════════════════════════════════════════
+const App = {
+  _source: 'gamerpower',
+
+  switchSource(src) {
+    this._source = src;
+    document.getElementById('srcGamerpower').classList.toggle('active', src === 'gamerpower');
+    document.getElementById('srcReddit').classList.toggle('active', src === 'reddit');
+    document.getElementById('srcBacklog').classList.toggle('active', src === 'backlog');
+    
+    Filters.sortMode = 'newest';
+    
+    if (src === 'backlog') {
+      Backlog.clearSearch(); // Resets search state and loads vault
+    } else {
+      this._currentSource().load(false);
+    }
+  },
+
+  refresh() {
+    const btn = document.getElementById('refreshBtn');
+    btn.classList.add('spinning'); btn.disabled = true;
+    this._currentSource().load(true).finally(() => {
+      btn.classList.remove('spinning'); btn.disabled = false;
+    });
+  },
+
+  _currentSource() { 
+    if (this._source === 'reddit') return Reddit;
+    if (this._source === 'backlog') return Backlog;
+    return GamerPower; 
+  },
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TIP JAR  (auto-reappears after 7 days)
+// ══════════════════════════════════════════════════════════════════════════════
+const TipJar = {
+  // Days until the tip jar reappears after being dismissed
+  COOLDOWN_DAYS: 1,
+
+  init() {
+    try {
+      const dismissedAt = localStorage.getItem('fd_tip_dismissed_v2');
+      if (dismissedAt) {
+        const elapsed = Date.now() - parseInt(dismissedAt, 10);
+        const cooldown = this.COOLDOWN_DAYS * 24 * 60 * 60 * 1000;
+        if (elapsed < cooldown) {
+          this._hide();
           return;
         }
+        // Cooldown expired — clear the flag so it shows again
+        localStorage.removeItem('fd_tip_dismissed_v2');
       }
     } catch { /* ignore */ }
-  }
+  },
 
-  renderSkeletons();
-  document.getElementById('liveCount').style.display = 'none';
-  document.getElementById('countInfo').style.display = 'none';
-  document.getElementById('cacheNote').style.display = 'none';
-
-  try {
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://www.gamerpower.com/api/giveaways?type=game&platform=pc')}`;
-    const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(10000) });
-    const outer = await res.json();
-    const games = JSON.parse(outer.contents);
-
-    if (!Array.isArray(games) || !games.length) throw new Error('No games returned');
-
-    try { localStorage.setItem(GP_CACHE_KEY, JSON.stringify({ ts: Date.now(), games })); } catch { /* full */ }
-    buildGPImageMap(games);
-    renderGPCards(games, false, null);
-  } catch (e) {
-    // Try stale cache
+  dismiss() {
     try {
-      const raw = localStorage.getItem(GP_CACHE_KEY);
-      if (raw) { const { ts, games } = JSON.parse(raw); renderGPCards(games, true, ts); return; }
+      // Store timestamp of dismissal instead of permanent '1'
+      localStorage.setItem('fd_tip_dismissed_v2', String(Date.now()));
     } catch { /* ignore */ }
-    renderError('Could not load GamerPower data: ' + e.message);
-  } finally {
-    btn.classList.remove('spinning');
-    btn.disabled = false;
-  }
-}
+    this._hide();
+  },
 
-// GamerPower platform key from platforms string
-function gpGetPlatformKey(platforms) {
-  if (!platforms) return null;
-  const p = platforms.toLowerCase();
-  if (p.includes('epic-games-store') || p.includes('epic')) return 'epic';
-  if (p.includes('gog'))    return 'gog';
-  if (p.includes('itchio') || p.includes('itch.io')) return 'itch';
-  if (p.includes('ubisoft')) return 'ubisoft';
-  if (p.includes('origin')) return 'origin';
-  if (p.includes('steam'))  return 'steam';
-  return null;
-}
+  _hide() {
+    document.getElementById('tipBar').classList.add('hidden');
+  },
 
-const GP_SECTIONS = [
-  { key: 'all',    label: 'All'      },
-  { key: 'steam',  label: 'Steam'    },
-  { key: 'epic',   label: 'Epic'     },
-  { key: 'itch',   label: 'Itch.io'  },
-  { key: 'gog',    label: 'GOG'      },
-  { key: 'others', label: 'Others'   },
-];
-
-let _gpCurrentSection = 'all';
-let _gpAllGames = [];
-const _gpImageMap = {}; // gameName (lowercase) → thumbnail url
-
-function gpGetGamesForSection(key, games) {
-  const MAIN_KEYS = ['steam','epic','itch','gog'];
-  if (key === 'all')    return games;
-  if (key === 'others') return games.filter(g => !MAIN_KEYS.includes(gpGetPlatformKey(g.platforms)));
-  return games.filter(g => gpGetPlatformKey(g.platforms) === key);
-}
-
-function gpRenderNav(games) {
-  const btns = GP_SECTIONS.map(s => {
-    const cnt = gpGetGamesForSection(s.key, games).length;
-    if (cnt === 0 && s.key !== 'all') return '';
-    const iconUrl = SECTION_ICONS[s.key];
-    const iconHtml = iconUrl
-      ? `<img src="${iconUrl}" class="pnav-icon" alt="" onerror="this.style.display='none'">`
-      : '';
-    return `<button class="pnav-btn${_gpCurrentSection === s.key ? ' active' : ''}"
-      onclick="gpSwitchSection('${s.key}')">${iconHtml}${s.label}<span class="pnav-count">${cnt}</span></button>`;
-  }).join('');
-  return `<div class="platform-nav">${btns}</div>`;
-}
-
-function gpSwitchSection(key) {
-  _gpCurrentSection = key;
-  gpRenderContent(_gpAllGames, null, null, false);
-}
-
-function gpRenderContent(games, fromCache, cacheTs, resetTab) {
-  if (resetTab) _gpCurrentSection = 'all';
-  const filtered = gpGetGamesForSection(_gpCurrentSection, games);
-  const nav = gpRenderNav(games);
-  const cardsHtml = filtered.length
-    ? `<div class="grid">${filtered.map((g, i) => buildGPCard(g, i)).join('')}</div>`
-    : `<div class="state-box" style="padding:40px 0"><div class="icon">🔍</div><p>No giveaways in this category right now.</p></div>`;
-  document.getElementById('content').innerHTML = nav + cardsHtml;
-}
-
-function renderGPCards(games, fromCache, cacheTs) {
-  _gpAllGames = games;
-
-  const cacheNote = document.getElementById('cacheNote');
-  if (fromCache && cacheTs) {
-    cacheNote.textContent = `cached ${cacheAge(cacheTs)}`;
-    cacheNote.style.display = 'inline';
-  } else {
-    cacheNote.style.display = 'none';
-  }
-
-  document.getElementById('liveCount').textContent = games.length + ' live';
-  document.getElementById('liveCount').style.display = 'inline-block';
-  document.getElementById('countInfo').innerHTML = `<span>${games.length}</span> active giveaways from GamerPower`;
-  document.getElementById('countInfo').style.display = 'block';
-
-  gpRenderContent(games, fromCache, cacheTs, true);
-}
-
-let _fetchController = null;
-
-async function loadGiveaways(forceRefresh = false) {
-  // Cancel any in-flight fetch before starting a new one
-  if (_fetchController) _fetchController.abort();
-  _fetchController = new AbortController();
-
-  const btn = document.getElementById('refreshBtn');
-  btn.classList.add('spinning');
-  btn.disabled = true;
-
-  // Try cache first (unless forced refresh)
-  if (!forceRefresh) {
-    const cached = loadCache();
-    if (cached) {
-      const { active, expired } = splitPosts(cached.posts);
-      renderCards(active, expired, true, cached.ts);
-      btn.classList.remove('spinning');
-      btn.disabled = false;
-      return;
-    }
-  }
-
-  renderSkeletons();
-  document.getElementById('liveCount').style.display = 'none';
-  document.getElementById('countInfo').style.display = 'none';
-  document.getElementById('cacheNote').style.display = 'none';
-
-  try {
-    const fetches = SUBREDDITS.map(async ({ name, endpoint, trustAll }) => {
-      const url = `https://www.reddit.com/r/${name}/${endpoint}.json?limit=100&raw_json=1`;
-      const posts = await fetchWithFallback(url, _fetchController.signal);
-      if (!posts) return [];
-      return posts.map(p => ({ ...p, _sub: name, _trustAll: trustAll }));
+  copy() {
+    const addr = document.getElementById('solAddress').textContent;
+    const btn  = document.getElementById('copyBtn');
+    navigator.clipboard.writeText(addr).then(() => {
+      btn.textContent = 'Copied ✓';
+      btn.classList.add('ok');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('ok');
+      }, 2000);
+    }).catch(() => {
+      const r = document.createRange();
+      r.selectNode(document.getElementById('solAddress'));
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(r);
     });
+  },
+};
 
-    const results = await Promise.allSettled(fetches);
-    const all = results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
-
-    if (!all.length) {
-      // Try serving stale cache rather than a blank error screen
-      const stale = loadCache();
-      if (stale) {
-        const { active, expired } = splitPosts(stale.posts);
-        renderCards(active, expired, true, stale.ts);
-        return;
-      }
-      renderError('All requests failed. Make sure you\'re connected to the internet and try again.');
-      return;
-    }
-
-    const seen = new Set();
-    const filtered = all
-      .filter(p => isFreeGame(p) && isRecent(p) && !p.stickied)
-      .filter(p => { if (seen.has(p.id)) return false; seen.add(p.id); return true; })
-      .sort((a, b) => b.created_utc - a.created_utc);
-
-    saveCache(filtered);
-    const { active, expired } = splitPosts(filtered);
-    renderCards(active, expired, false, null);
-
-  } catch (e) {
-    renderError('Unexpected error: ' + e.message);
-  } finally {
-    btn.classList.remove('spinning');
-    btn.disabled = false;
-  }
-}
-
-function splitPosts(posts) {
-  return {
-    active:  posts.filter(p => !isExpired(p)),
-    expired: posts.filter(p =>  isExpired(p)),
-  };
-}
-
-// Auto-load on open — GamerPower is the default tab
-loadGamerPower(false);
-
-// ── Steam CDN image loader ─────────────────────────────────────────────────
-// Called by onerror on broken Reddit thumbs
-async function loadSteamThumb(imgEl, gameName) {
-  const url = await fetchSteamImage(gameName);
-  if (url) {
-    imgEl.src = url;
-    imgEl.onerror = () => { imgEl.outerHTML = '<div class="card-thumb-placeholder">🎮</div>'; };
-  } else {
-    imgEl.outerHTML = '<div class="card-thumb-placeholder">🎮</div>';
-  }
-}
-
-// After cards render, async-fill placeholders:
-// 1. Try GamerPower image map (instant, no fetch)
-// 2. Fall back to Steam CDN search
-async function fillMissingThumbs() {
-  const placeholders = document.querySelectorAll('.card-thumb-placeholder[data-game]');
-  for (const el of placeholders) {
-    const gameName = el.getAttribute('data-game');
-    if (!gameName) continue;
-
-    // Try GP map first (no network call)
-    const gpUrl = findGPImage(gameName);
-    const url   = gpUrl || await fetchSteamImage(gameName);
-
-    if (url) {
-      const img = document.createElement('img');
-      img.className = 'card-thumb';
-      img.src = url;
-      img.alt = '';
-      img.loading = 'lazy';
-      img.onerror = () => { img.outerHTML = '<div class="card-thumb-placeholder">🎮</div>'; };
-      el.replaceWith(img);
-    }
-  }
-}
-
-
-// ── Tip jar ───────────────────────────────────────────────────────────────────
-function copyWallet() {
-  const addr = document.getElementById('solAddress').textContent;
-  navigator.clipboard.writeText(addr).then(() => {
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = 'Copied ✓';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
-  }).catch(() => {
-    const el = document.getElementById('solAddress');
-    const range = document.createRange();
-    range.selectNode(el);
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(range);
-  });
-}
+// ── Boot ──────────────────────────────────────────────────────────────────────
+TipJar.init();
+Backlog.loadStorage(); // Ensures save states reflect correctly on first load
+GamerPower.load(false);
 </script>
-
-
-
-
-<!-- Fixed tip bar — always visible at the bottom of the screen -->
-<div class="tip-bar" id="tipJar">
-  <div class="tip-bar-inner">
-    <div class="tip-bar-left">
-      <div class="tip-bar-icon">🎮</div>
-      <span class="tip-bar-label">
-        <strong>Saved you some cash?</strong>
-        If FreeDrops helped you grab a free game, a small tip keeps the project alive.
-      </span>
-    </div>
-    <div class="tip-wallet">
-      <span class="tip-sol-badge">SOL</span>
-      <span class="tip-address" id="solAddress">GnFPSXyABYNVruNvkmidMda2RjLZCcTcyMHvVCk5bMqE</span>
-      <button class="tip-copy-btn" id="copyBtn" onclick="copyWallet()">Copy</button>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
